@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">PreFlop Pal</string>
+    <string-array name="poker_positions">
+        <item>Button (BTN)</item>
+        <item>Small Blind (SB)</item>
+        <item>Big Blind (BB)</item>
+        <item>Under the Gun (UTG)</item>
+        <item>Middle Position (MP)</item>
+        <item>Cut-off (CO)</item>
+    </string-array>
+</resources>
