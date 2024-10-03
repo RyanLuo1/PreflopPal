@@ -1,12 +1,13 @@
 package com.ryanluo.prefloppal
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.AutoCompleteTextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.TextView
+import android.widget.AdapterView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var card1TextView: TextView
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         setupCardSelection()
-        setupPositionSpinner()
+        setupPositionDropdown()
         setupBottomNavigation()
     }
 
@@ -40,15 +41,15 @@ class MainActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, "CardSelectionDialog")
     }
 
-    private fun setupPositionSpinner() {
-        val spinner: Spinner = findViewById(R.id.positionSpinner)
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.poker_positions,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter
+    private fun setupPositionDropdown() {
+        val positions = arrayOf("Button (BTN)", "Small Blind (SB)", "Big Blind (BB)", "Under the Gun (UTG)", "Middle Position (MP)", "Cut-off (CO)")
+        val adapter = ArrayAdapter(this, R.layout.dropdown_item, positions)
+        val positionDropdown: AutoCompleteTextView = findViewById(R.id.positionDropdown)
+        positionDropdown.setAdapter(adapter)
+
+        positionDropdown.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            val selectedPosition = parent.getItemAtPosition(position) as String
+            // Do something with the selected position
         }
     }
 
