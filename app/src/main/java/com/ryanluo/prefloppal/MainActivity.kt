@@ -1,5 +1,6 @@
 package com.ryanluo.prefloppal
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -17,9 +18,14 @@ import com.google.android.material.button.MaterialButton
 class MainActivity : AppCompatActivity() {
     private lateinit var card1TextView: TextView
     private lateinit var card2TextView: TextView
+
     private lateinit var positionDropdown: AutoCompleteTextView
+
     private lateinit var getAdviceButton: MaterialButton
     private lateinit var adviceText: TextView
+
+    private lateinit var explanationText: TextView
+
     private lateinit var handStrengthLabel: TextView
     private lateinit var handStrengthBar: ProgressBar
     private lateinit var handStrengthText: TextView
@@ -28,13 +34,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        setupToolbar()
 
         setupCardSelection()
         setupPositionDropdown()
         setupGetAdviceButton()
+        explanationText = findViewById(R.id.explanationText)
         setupBottomNavigation()
+    }
+
+    private fun setupToolbar() {
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        // Remove default title
+        supportActionBar?.setDisplayShowTitleEnabled(false)
     }
 
     private fun setupCardSelection() {
@@ -80,11 +94,12 @@ class MainActivity : AppCompatActivity() {
             if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position") {
                 val (advice, handStrength) = getAdviceAndStrength(card1, card2, position)
                 displayAdvice(advice)
+                displayExplanation(advice, card1, card2, position)
                 displayHandStrength(handStrength)
-                showHandStrengthElements()
+                showAdviceElements()
             } else {
                 Toast.makeText(this, "Please select both cards and a position", Toast.LENGTH_SHORT).show()
-                hideHandStrengthElements()
+                hideAdviceElements()
             }
         }
     }
@@ -107,15 +122,47 @@ class MainActivity : AppCompatActivity() {
                 "Fold" -> ContextCompat.getColor(this, R.color.red)
                 "Call" -> ContextCompat.getColor(this, R.color.blue_500)
                 "Raise" -> ContextCompat.getColor(this, R.color.green_500)
-                else -> ContextCompat.getColor(this, R.color.text_color_primary)
+                else -> ContextCompat.getColor(this, android.R.color.white)
             }
         )
+    }
+
+    private fun displayExplanation(advice: String, card1: String, card2: String, position: String) {
+        val explanation = when (advice) {
+            "Fold" -> "With $card1 $card2 in $position, your hand is weak compared to the likely hands of your opponents. It's best to fold and wait for a better opportunity."
+            "Call" -> "Your $card1 $card2 in $position has potential, but it's not strong enough to raise. Calling allows you to see the flop cheaply and potentially improve your hand."
+            "Raise" -> "Holding $card1 $card2 in $position gives you a strong hand that's likely to be ahead of your opponents' ranges. Raising here will help build the pot and potentially force weaker hands to fold."
+            else -> "Based on your $card1 $card2 in $position, this is the recommended action. Consider the specific game context and adjust accordingly."
+        }
+        explanationText.text = explanation
+    }
+
+    private fun showAdviceElements() {
+        adviceText.visibility = View.VISIBLE
+        explanationText.visibility = View.VISIBLE
+        handStrengthLabel.visibility = View.VISIBLE
+        handStrengthBar.visibility = View.VISIBLE
+        handStrengthText.visibility = View.VISIBLE
+    }
+
+    private fun hideAdviceElements() {
+        adviceText.visibility = View.GONE
+        explanationText.visibility = View.GONE
+        handStrengthLabel.visibility = View.GONE
+        handStrengthBar.visibility = View.GONE
+        handStrengthText.visibility = View.GONE
     }
 
     private fun displayHandStrength(strength: Double) {
         val strengthPercentage = (strength * 10).toInt()
         handStrengthBar.progress = strengthPercentage
         handStrengthText.text = String.format("%.1f / 10.0", strength)
+
+        // Keep the text color black
+        handStrengthText.setTextColor(ContextCompat.getColor(this, android.R.color.white))
+
+        // Ensure the progress bar is visible
+        handStrengthBar.visibility = View.VISIBLE
     }
 
     private fun showHandStrengthElements() {

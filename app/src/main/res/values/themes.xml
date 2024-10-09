@@ -21,7 +21,7 @@
         <!-- Customize your theme here. -->
 
         <!-- dropdown -->
-        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorPrimary">@color/white</item>
 
     </style>
 

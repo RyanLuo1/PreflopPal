@@ -10,7 +10,9 @@
         <color name="light_gray_300">#E0E0E0</color>
         <color name="dark_gray_900">#212121</color>
         <color name="blue_500">#2196F3</color>
-        <color name="text_color_primary">#FFFFFF</color>
         <color name="text_color_secondary">#B3FFFFFF</color>
         <color name="red">#FF0000</color>
+        <color name="yellow">#FFFF00</color>
+        <color name="green">#00FF00</color>
+        <color name="card_background">#2A2E37</color>
 </resources>
