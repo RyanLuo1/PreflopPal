@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupPositionDropdown() {
-        val positions = listOf("UTG", "UTG+1", "UTG+2", "MP", "MP+1", "HJ", "CO", "BTN", "SB", "BB")
+        val positions = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
         val adapter = ArrayAdapter(this, R.layout.dropdown_item, positions)
         positionDropdown = findViewById(R.id.positionDropdown)
         positionDropdown.setAdapter(adapter)
@@ -70,8 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         val suggestions = listOf(
             "UTG folds",
-            "UTG calls",
-            "UTG raises to 2 BB",
+            "UTG raises to 2.5 BB",
             "UTG all in"
         )
 
@@ -83,15 +82,18 @@ class MainActivity : AppCompatActivity() {
     private fun updatePreviousActionInput(selectedPosition: String) {
         when (selectedPosition) {
             "UTG" -> {
-                previousActionInput.setText("No previous action")
+                previousActionInput.setText("No action")
                 previousActionInput.isEnabled = false
-                previousActionInput.setAdapter(null)
+            }
+            "BB" -> {
+                previousActionInput.setText("")
+                previousActionInput.isEnabled = true
+                previousActionInput.hint = "Enter previous actions"
             }
             else -> {
                 previousActionInput.setText("")
                 previousActionInput.isEnabled = true
                 previousActionInput.hint = "Enter previous actions"
-                setupPreviousActionInput() // Re-setup suggestions for non-UTG positions
             }
         }
     }
@@ -115,9 +117,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getAdviceAndStrength(card1: String, card2: String, position: String, previousAction: String): Triple<String, String, Double> {
-        // TODO: Implement your logic here to generate advice, explanation, and hand strength
-        // This is a placeholder implementation
-        return Triple("Raise", "You have a strong hand in good position. Previous action: $previousAction", 7.5)
+        val hand = Hand(Card(card1[0], card1[1]), Card(card2[0], card2[1]))
+        return PokerLogic.getAdvice(hand, position, previousAction)
     }
 
     private fun showAdvicePopup(advice: String, explanation: String, handStrength: Double) {
