@@ -38,19 +38,75 @@ object PokerLogic {
     private val CALLING_RANGES = RFICallingRanges.RANGES
     private val THREE_BET_RANGES = RFIThreeBetRanges.RANGES
 
+    private fun parsePreviousAction(previousAction: String): List<Pair<String, String>> {
+        if (previousAction.isBlank() || previousAction.toLowerCase() == "no action") {
+            return emptyList()
+        }
+
+        val actions = previousAction.split(Regex("[,.]")).map { it.trim().toLowerCase() }
+        val positionMap = mapOf(
+            "utg" to "UTG", "utg+1" to "UTG", "utg+2" to "UTG",
+            "mp" to "MP", "mp+1" to "MP", "hj" to "MP",
+            "co" to "CO", "cutoff" to "CO",
+            "btn" to "BTN", "button" to "BTN",
+            "sb" to "SB", "smallblind" to "SB",
+            "bb" to "BB", "bigblind" to "BB"
+        )
+        val actionKeywords = mapOf(
+            "folds" to "folds", "fold" to "folds", "folded" to "folds",
+            "raises" to "raises", "raise" to "raises", "raised" to "raises",
+            "3 bets" to "3-bets", "3bet" to "3-bets", "3-bet" to "3-bets", "3 bet" to "3-bets"
+        )
+
+        val parsedActions = mutableListOf<Pair<String, String>>()
+        var raiseCount = 0
+
+        for (action in actions) {
+            val words = action.split(Regex("\\s+"))
+            var position: String? = null
+            var actionType: String? = null
+
+            for (word in words) {
+                if (position == null) {
+                    position = positionMap[word.toLowerCase()]
+                }
+                if (actionType == null) {
+                    actionType = actionKeywords[word.toLowerCase()]
+                    if (actionType == null && word.toLowerCase().contains("bet")) {
+                        actionType = "3-bets"
+                    }
+                }
+                if (position != null && actionType != null) {
+                    break
+                }
+            }
+
+            if (position != null && actionType != null) {
+                if (actionType == "raises") {
+                    raiseCount++
+                    if (raiseCount > 1) {
+                        actionType = "3-bets"
+                    }
+                }
+                parsedActions.add(Pair(position, actionType))
+            }
+        }
+
+        return parsedActions
+    }
+
     fun getAdvice(hand: Hand, position: String, previousAction: String?): Triple<String, String, Double> {
         val handKey = hand.toKey()
         val handStrength = calculateHandStrength(hand, position)
 
         val actions = parsePreviousAction(previousAction ?: "")
-        val lastRaise = actions.lastOrNull { it.second == "raises" }
+        val lastRaise = actions.lastOrNull { it.second == "raises" || it.second == "3-bets" }
 
         val advice: String
         val explanation: String
 
         when {
             actions.isEmpty() || actions.all { it.second == "folds" } -> {
-                // RFI situation
                 if (position in RFI_RANGES && RFI_RANGES[position]?.contains(hand) == true) {
                     advice = "Raise"
                     explanation = "This hand ($handKey) is in the RFI range for $position. You should raise."
@@ -59,11 +115,37 @@ object PokerLogic {
                     explanation = "This hand ($handKey) is not in the RFI range for $position. You should fold."
                 }
             }
-            lastRaise != null -> {
-                // Facing a raise
+            lastRaise?.second == "3-bets" -> {
+                val threeBetPosition = lastRaise.first
+                if (position in FacingThreeBetRanges.RANGES && threeBetPosition in FacingThreeBetRanges.RANGES[position].orEmpty()) {
+                    val facingThreeBetRange = FacingThreeBetRanges.RANGES[position]!![threeBetPosition]!!
+                    when {
+                        facingThreeBetRange.fourBetValueRange.contains(hand) -> {
+                            advice = "4-Bet for Value"
+                            explanation = "This hand ($handKey) is strong enough to 4-bet for value against a 3-bet from $threeBetPosition when you're in $position."
+                        }
+                        facingThreeBetRange.fourBetBluffRange.contains(hand) -> {
+                            advice = "4-Bet as a Bluff or Fold"
+                            explanation = "This hand ($handKey) is suitable for a 4-bet bluff against a 3-bet from $threeBetPosition when you're in $position."
+                        }
+                        facingThreeBetRange.coldCallRange.contains(hand) -> {
+                            advice = "Cold Call"
+                            explanation = "This hand ($handKey) is in the cold calling range against a 3-bet from $threeBetPosition when you're in $position."
+                        }
+                        else -> {
+                            advice = "Fold"
+                            explanation = "This hand ($handKey) is not strong enough to continue against a 3-bet from $threeBetPosition when you're in $position."
+                        }
+                    }
+                } else {
+                    advice = "Fold"
+                    explanation = "There's no defined strategy for this position ($position) against a 3-bet from $threeBetPosition. It's safest to fold."
+                }
+            }
+            lastRaise?.second == "raises" -> {
                 val raiserPosition = lastRaise.first
-                if (position in THREE_BET_RANGES && raiserPosition in THREE_BET_RANGES[position].orEmpty()) {
-                    val threeBetRange = THREE_BET_RANGES[position]!![raiserPosition]!!
+                if (position in RFIThreeBetRanges.RANGES && raiserPosition in RFIThreeBetRanges.RANGES[position].orEmpty()) {
+                    val threeBetRange = RFIThreeBetRanges.RANGES[position]!![raiserPosition]!!
                     when {
                         threeBetRange.valueRange.contains(hand) -> {
                             advice = "3-Bet for Value"
@@ -73,7 +155,7 @@ object PokerLogic {
                             advice = "3-Bet as a Bluff"
                             explanation = "This hand ($handKey) is in the bluff 3-betting range against a raise from $raiserPosition when you're in $position."
                         }
-                        CALLING_RANGES[position]?.get(raiserPosition)?.contains(hand) == true -> {
+                        RFICallingRanges.RANGES[position]?.get(raiserPosition)?.contains(hand) == true -> {
                             advice = "Call"
                             explanation = "This hand ($handKey) is in the calling range against a raise from $raiserPosition when you're in $position."
                         }
@@ -88,60 +170,12 @@ object PokerLogic {
                 }
             }
             else -> {
-                // Unexpected scenario
                 advice = "Fold"
                 explanation = "Unexpected scenario. For safety, it's recommended to fold unless you're very confident. Consider the actions: ${actions.joinToString(", ") { "${it.first} ${it.second}" }}."
             }
         }
 
         return Triple(advice, explanation, handStrength)
-    }
-
-    private fun parsePreviousAction(previousAction: String): List<Pair<String, String>> {
-        if (previousAction.isBlank() || previousAction.toLowerCase() == "no action") {
-            return emptyList()
-        }
-
-        val actions = previousAction.split(Regex("[,.]")).map { it.trim().toLowerCase() }
-        val positionMap = mapOf(
-            "utg" to "UTG", "utg+1" to "UTG", "utg+2" to "UTG",
-            "mp" to "MP", "mp+1" to "MP", "hj" to "MP", "hijack" to "MP",
-            "co" to "CO", "cutoff" to "CO",
-            "btn" to "BTN", "button" to "BTN",
-            "sb" to "SB", "smallblind" to "SB",
-            "bb" to "BB", "bigblind" to "BB"
-        )
-        val actionKeywords = mapOf(
-            "folds" to "folds", "fold" to "folds", "folded" to "folds",
-            "raises" to "raises", "raise" to "raises", "raised" to "raises",
-            "3-bets" to "raises", "3bet" to "raises", "3-bet" to "raises"
-        )
-
-        val parsedActions = mutableListOf<Pair<String, String>>()
-
-        for (action in actions) {
-            val words = action.split(Regex("\\s+"))
-            var position: String? = null
-            var actionType: String? = null
-
-            for (word in words) {
-                if (position == null) {
-                    position = positionMap[word]
-                }
-                if (actionType == null) {
-                    actionType = actionKeywords[word]
-                }
-                if (position != null && actionType != null) {
-                    break
-                }
-            }
-
-            if (position != null && actionType != null) {
-                parsedActions.add(Pair(position, actionType))
-            }
-        }
-
-        return parsedActions
     }
 
     private fun calculateHandStrength(hand: Hand, position: String): Double {
