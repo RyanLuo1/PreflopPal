@@ -55,7 +55,7 @@ object PokerLogic {
         val actionKeywords = mapOf(
             "folds" to "folds", "fold" to "folds", "folded" to "folds",
             "raises" to "raises", "raise" to "raises", "raised" to "raises",
-            "3 bets" to "3-bets", "3bet" to "3-bets", "3-bet" to "3-bets", "3 bet" to "3-bets"
+            "3 bets" to "3-bets", "3bet" to "3-bets", "3-bet" to "3-bets", "3 bet" to "3-bets", "3!" to "3-bets"
         )
 
         val parsedActions = mutableListOf<Pair<String, String>>()
@@ -106,7 +106,8 @@ object PokerLogic {
         val explanation: String
 
         when {
-            actions.isEmpty() || actions.all { it.second == "folds" } -> {
+            actions.isEmpty() || previousAction.isNullOrBlank() || previousAction == "No action" || actions.all { it.second == "folds" } -> {
+                // RFI situation
                 if (position in RFI_RANGES && RFI_RANGES[position]?.contains(hand) == true) {
                     advice = "Raise"
                     explanation = "This hand ($handKey) is in the RFI range for $position. You should raise."
@@ -152,7 +153,7 @@ object PokerLogic {
                             explanation = "This hand ($handKey) is in the value 3-betting range against a raise from $raiserPosition when you're in $position."
                         }
                         threeBetRange.bluffRange.contains(hand) -> {
-                            advice = "3-Bet as a Bluff"
+                            advice = "3-Bet as a Bluff or Fold"
                             explanation = "This hand ($handKey) is in the bluff 3-betting range against a raise from $raiserPosition when you're in $position."
                         }
                         RFICallingRanges.RANGES[position]?.get(raiserPosition)?.contains(hand) == true -> {

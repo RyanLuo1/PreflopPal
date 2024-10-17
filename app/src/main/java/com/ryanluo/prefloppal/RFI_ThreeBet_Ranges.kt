@@ -12,8 +12,8 @@ object RFIThreeBetRanges {
         ),
         "CO" to mapOf(
             "UTG" to ThreeBetRange(
-                valueRange = Range(setOf("AA", "KK", "QQ", "AKs", "AKo")),
-                bluffRange = Range(setOf("A4s", "A3s"))
+                valueRange = Range(setOf("AA", "KK", "QQ", "AKs", "AKo", "AQs")),
+                bluffRange = Range(setOf("AQo", "AJo", "A5s", "A4s"))
             ),
             "MP" to ThreeBetRange(
                 valueRange = Range(setOf("AA", "KK", "QQ", "AKs", "AKo")),

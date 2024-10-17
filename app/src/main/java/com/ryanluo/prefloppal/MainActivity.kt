@@ -67,33 +67,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupPreviousActionInput() {
         previousActionInput = findViewById(R.id.previousActionInput)
-
-        val suggestions = listOf(
-            "UTG folds",
-            "UTG raises to 2.5 BB",
-            "UTG all in"
-        )
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
-        previousActionInput.setAdapter(adapter)
-        previousActionInput.threshold = 1 // Start showing suggestions after 1 character
     }
 
     private fun updatePreviousActionInput(selectedPosition: String) {
         when (selectedPosition) {
             "UTG" -> {
-                previousActionInput.setText("No action")
-                previousActionInput.isEnabled = false
-            }
-            "BB" -> {
-                previousActionInput.setText("")
+                val suggestions = arrayOf("No action")
+                val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
+                previousActionInput.setAdapter(adapter)
+                previousActionInput.setText("") // Clear any existing text
                 previousActionInput.isEnabled = true
-                previousActionInput.hint = "Enter previous actions"
             }
             else -> {
-                previousActionInput.setText("")
+                val suggestions = arrayOf(
+                    "UTG folds",
+                    "UTG raises to 2.5 BB",
+                    "UTG all in"
+                )
+                val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
+                previousActionInput.setAdapter(adapter)
+                previousActionInput.setText("") // Clear any existing text
                 previousActionInput.isEnabled = true
-                previousActionInput.hint = "Enter previous actions"
             }
         }
     }

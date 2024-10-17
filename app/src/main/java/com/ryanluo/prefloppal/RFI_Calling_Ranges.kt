@@ -4,16 +4,16 @@ object RFICallingRanges {
     val RANGES = mapOf(
         "MP" to mapOf(
             "UTG" to Range(setOf(
-                "JJ", "TT", "99", "88",
+                "JJ", "TT", "99", "88", "77", "66",
                 "AQs", "AJs", "ATs", "KQs",
+                "JTs", "T9s", "98s",
                 "AQo"
             ))
         ),
         "CO" to mapOf(
             "UTG" to Range(setOf(
-                "JJ", "TT", "99", "88", "77",
-                "AQs", "AJs", "ATs", "A5s", "KQs", "KJs", "QJs",
-                "AQo"
+                "JJ", "TT", "99", "88", "77", "66",
+                "AJs", "ATs", "KQs", "KJs", "KTs","QJs", "QTs", "JTs", "T9s", "98s"
             )),
             "MP" to Range(setOf(
                 "JJ", "TT", "99", "88", "77",
