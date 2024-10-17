@@ -41,6 +41,8 @@ class AdviceDialogFragment : DialogFragment() {
             advice.contains("raise", ignoreCase = true) -> R.color.green_500
             advice.contains("call", ignoreCase = true) -> R.color.blue_500
             advice.contains("fold", ignoreCase = true) -> R.color.red
+            advice.contains("3-Bet for Value", ignoreCase = true) -> R.color.green
+            advice.contains("3-Bet as a Bluff", ignoreCase = true) -> R.color.orange
             else -> android.R.color.white
         }
         return ContextCompat.getColor(requireContext(), colorRes)

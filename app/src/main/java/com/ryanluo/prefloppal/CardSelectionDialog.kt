@@ -19,7 +19,7 @@ class CardSelectionDialog : DialogFragment() {
     private var selectedRank: String? = null
     private var selectedSuit: String? = null
 
-    private val ranks = listOf("A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2")
+    private val ranks = listOf("A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2")
     private val suits = listOf("♠", "♥", "♦", "♣")
 
     fun setOnCardSelectedListener(listener: (String) -> Unit) {
