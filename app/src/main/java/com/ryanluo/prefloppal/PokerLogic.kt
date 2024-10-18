@@ -1,5 +1,7 @@
 package com.ryanluo.prefloppal
 
+import kotlin.math.abs
+
 data class Card(val rank: Char, val suit: Char) {
     override fun toString() = "$rank$suit"
 }
@@ -129,8 +131,8 @@ object PokerLogic {
                             advice = "4-Bet as a Bluff or Fold"
                             explanation = "This hand ($handKey) is suitable for a 4-bet bluff against a 3-bet from $threeBetPosition when you're in $position."
                         }
-                        facingThreeBetRange.coldCallRange.contains(hand) -> {
-                            advice = "Cold Call"
+                        facingThreeBetRange.callRange.contains(hand) -> {
+                            advice = "Call"
                             explanation = "This hand ($handKey) is in the cold calling range against a 3-bet from $threeBetPosition when you're in $position."
                         }
                         else -> {
@@ -180,33 +182,48 @@ object PokerLogic {
     }
 
     private fun calculateHandStrength(hand: Hand, position: String): Double {
-        val baseStrength = when {
-            hand.isPair -> when (hand.card1.rank) {
-                'A' -> 10.0
-                'K' -> 9.0
-                'Q' -> 8.0
-                'J' -> 7.0
-                'T' -> 6.0
-                in '9'..'2' -> 5.0
+        val rankOrder = listOf('A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2')
+
+        fun calculateBaseStrength(hand: Hand): Double {
+            return when {
+                hand.isPair -> 6.0 + (14 - rankOrder.indexOf(hand.card1.rank)) * 0.3
+                else -> {
+                    val highCardRank = minOf(rankOrder.indexOf(hand.card1.rank), rankOrder.indexOf(hand.card2.rank))
+                    val lowCardRank = maxOf(rankOrder.indexOf(hand.card1.rank), rankOrder.indexOf(hand.card2.rank))
+                    5.0 + (14 - highCardRank) * 0.2 + (14 - lowCardRank) * 0.1
+                }
+            }
+        }
+
+        fun getPositionMultiplier(position: String): Double {
+            return when (position) {
+                "BTN" -> 1.2
+                "CO" -> 1.15
+                "MP" -> 1.1
+                "UTG" -> 1.0
+                "SB" -> 0.95
+                "BB" -> 0.9
+                else -> 1.0
+            }
+        }
+
+        fun getConnectorBonus(hand: Hand): Double {
+            if (hand.isPair) return 0.0
+            val rank1 = rankOrder.indexOf(hand.card1.rank)
+            val rank2 = rankOrder.indexOf(hand.card2.rank)
+            val gap = abs(rank1 - rank2)
+            return when {
+                gap == 1 -> 0.5  // Connector
+                gap == 2 -> 0.3  // One-gapper
+                gap == 3 -> 0.1  // Two-gapper
                 else -> 0.0
             }
-            hand.isSuited && hand.card1.rank in "AK" && hand.card2.rank in "AK" -> 9.0
-            hand.card1.rank in "AK" && hand.card2.rank in "AK" -> 8.0
-            hand.isSuited && hand.card1.rank in "AK" -> 7.0
-            hand.card1.rank in "AK" -> 6.0
-            hand.isSuited -> 5.0
-            else -> 4.0
         }
 
-        val positionBonus = when (position) {
-            "BTN", "CO" -> 1.0
-            "MP" -> 0.5
-            "UTG" -> 0.0
-            "SB" -> -0.5
-            "BB" -> -1.0
-            else -> 0.0
-        }
-
-        return (baseStrength + positionBonus).coerceIn(0.0, 10.0)
+        val baseStrength = calculateBaseStrength(hand)
+        val positionMultiplier = getPositionMultiplier(position)
+        val suitednessBonus = if (hand.isSuited) 0.5 else 0.0
+        val connectorBonus = getConnectorBonus(hand)
+        return (baseStrength * positionMultiplier + suitednessBonus + connectorBonus).coerceIn(0.0, 10.0)
     }
 }

@@ -50,12 +50,19 @@ class MainActivity : AppCompatActivity() {
         dialog.setOnCardSelectedListener { selectedCard ->
             cardView.text = selectedCard
         }
+        // Get the currently selected cards
+        val selectedCards = setOf(card1TextView.text.toString(), card2TextView.text.toString())
+
+        // Remove the empty string if a card hasn't been selected yet
+        val unavailableCards = selectedCards.filter { it.isNotEmpty() }.toSet()
+
+        dialog.setUnavailableCards(unavailableCards)
         dialog.show(supportFragmentManager, "CardSelectionDialog")
     }
 
     private fun setupPositionDropdown() {
         val positions = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
-        val adapter = ArrayAdapter(this, R.layout.dropdown_item, positions)
+        val adapter = ArrayAdapter(this, R.layout.position_dropdown, positions)
         positionDropdown = findViewById(R.id.positionDropdown)
         positionDropdown.setAdapter(adapter)
 
@@ -101,11 +108,16 @@ class MainActivity : AppCompatActivity() {
             val position = positionDropdown.text.toString()
             val previousAction = previousActionInput.text.toString()
 
-            if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position") {
+            if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position" && position != "") {
                 val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction)
                 showAdvicePopup(advice, explanation, handStrength)
             } else {
-                Toast.makeText(this, "Please select both cards, a position, and describe any previous action", Toast.LENGTH_SHORT).show()
+                val missingItems = mutableListOf<String>()
+                if (card1.isEmpty() || card2.isEmpty()) missingItems.add("cards")
+                if (position == "Select Position" || position == "") missingItems.add("position")
+
+                val missingItemsText = missingItems.joinToString(", ")
+                Toast.makeText(this, "Please select $missingItemsText before getting advice", Toast.LENGTH_LONG).show()
             }
         }
     }

@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.ryanluo.prefloppal.R
 
-
 class CardSelectionDialog : DialogFragment() {
     private lateinit var onCardSelectedListener: (String) -> Unit
     private var unavailableCards: Set<String> = emptySet()
@@ -31,7 +30,7 @@ class CardSelectionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.dialog_card_selection, null)
 
@@ -93,9 +92,9 @@ class CardSelectionDialog : DialogFragment() {
     private fun createButton(text: String): Button {
         return Button(requireContext()).apply {
             this.text = text
-            setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.light_gray_300))
-            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-            textSize = 20f
+            setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple))
+            textSize = 18f
             setTypeface(null, Typeface.BOLD)
         }
     }
@@ -104,11 +103,11 @@ class CardSelectionDialog : DialogFragment() {
         for (i in 0 until layout.childCount) {
             (layout.getChildAt(i) as? Button)?.let { button ->
                 if (button == selectedButton) {
-                    button.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-                    button.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+                    button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary_purple))
+                    button.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple))
                 } else {
-                    button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_gray_800))
-                    button.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    button.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    button.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple))
                 }
             }
         }
