@@ -113,10 +113,10 @@ object PokerLogic {
                 // RFI situation
                 if (position in RFI_RANGES && RFI_RANGES[position]?.contains(hand) == true) {
                     advice = "Raise"
-                    explanation = "This hand ($handKey) is in the RFI range for $position. You should raise."
+                    explanation = "Your hand ($handKey) is strong enough to raise from $position. It’s a good spot to be more aggressive."
                 } else {
                     advice = "Fold"
-                    explanation = "This hand ($handKey) is not in the RFI range for $position. You should fold."
+                    explanation = "Your hand ($handKey) isn’t ideal for raising from $position. It’s better to fold and wait for a stronger spot."
                 }
             }
             lastRaise?.second == "3-bets" -> {
@@ -126,19 +126,24 @@ object PokerLogic {
                     when {
                         facingThreeBetRange.fourBetValueRange.contains(hand) -> {
                             advice = "4-Bet for Value"
-                            explanation = "This hand ($handKey) is strong enough to 4-bet for value against a 3-bet from $threeBetPosition when you're in $position."
+                            explanation = "This hand ($handKey) is strong enough to 4-bet for value against a 3-bet from $threeBetPosition when you're in $position. " +
+                                    "A value 4-bet aims to maximize the potential of your strong hand by building a larger pot, especially when you expect weaker hands to continue or call."
                         }
                         facingThreeBetRange.fourBetBluffRange.contains(hand) -> {
                             advice = "4-Bet as a Bluff or Fold"
-                            explanation = "This hand ($handKey) is suitable for a 4-bet bluff against a 3-bet from $threeBetPosition when you're in $position."
+                            explanation = "This hand ($handKey) can be used as a 4-bet bluff against a 3-bet from $threeBetPosition when you're in $position. " +
+                                    "Bluffing with a 4-bet adds pressure on your opponent, often forcing folds from marginal hands. Using these bluffs also helps balance your overall range, " +
+                                    "making it harder for opponents to read your hand strength in similar situations."
                         }
                         facingThreeBetRange.callRange.contains(hand) -> {
                             advice = "Call"
-                            explanation = "This hand ($handKey) is in the cold calling range against a 3-bet from $threeBetPosition when you're in $position."
+                            explanation = "This hand ($handKey) is solid enough to call against a 3-bet from $threeBetPosition when you're in $position. " +
+                                    "It has the potential to play well post-flop, allowing you to see how the board develops without committing more chips preflop."
                         }
                         else -> {
                             advice = "Fold"
-                            explanation = "This hand ($handKey) is not strong enough to continue against a 3-bet from $threeBetPosition when you're in $position."
+                            explanation = "This hand ($handKey) isn't strong enough to continue against a 3-bet from $threeBetPosition when you're in $position. " +
+                                    "Folding now helps avoid risky situations with weaker hands."
                         }
                     }
                 } else {
@@ -153,11 +158,13 @@ object PokerLogic {
                     when {
                         threeBetRange.valueRange.contains(hand) -> {
                             advice = "3-Bet for Value"
-                            explanation = "This hand ($handKey) is in the value 3-betting range against a raise from $raiserPosition when you're in $position."
+                            explanation = "This hand ($handKey) is strong enough to 3-bet for value against a raise from $raiserPosition when you're in $position. " +
+                                    "A value 3-bet here aims to get more chips into the pot with a hand that performs well postflop if called."
                         }
                         threeBetRange.bluffRange.contains(hand) -> {
                             advice = "3-Bet as a Bluff or Fold"
-                            explanation = "This hand ($handKey) is in the bluff 3-betting range against a raise from $raiserPosition when you're in $position."
+                            explanation = "This hand ($handKey) is in the 3-bet bluffing range against a raise from $raiserPosition when you're in $position. " +
+                                    "3-bet bluffs add pressure on your opponent and also balance your own 3-betting range, but they should only be used a small percentage of the time."
                         }
                         RFICallingRanges.RANGES[position]?.get(raiserPosition)?.contains(hand) == true -> {
                             advice = "Call"
@@ -165,7 +172,8 @@ object PokerLogic {
                         }
                         else -> {
                             advice = "Fold"
-                            explanation = "This hand ($handKey) is not in the calling or 3-betting range against a raise from $raiserPosition when you're in $position."
+                            explanation = "This hand ($handKey) is not strong enough to call or 3-bet against a raise from $raiserPosition when you're in $position. " +
+                                    "Folding is the safest option here."
                         }
                     }
                 } else {
@@ -175,7 +183,7 @@ object PokerLogic {
             }
             else -> {
                 advice = "Fold"
-                explanation = "Unexpected scenario. For safety, it's recommended to fold unless you're very confident. Consider the actions: ${actions.joinToString(", ") { "${it.first} ${it.second}" }}."
+                explanation = "Unexpected scenario. It's recommended to fold unless you're very confident. Consider the actions: ${actions.joinToString(", ") { "${it.first} ${it.second}" }}."
             }
         }
 

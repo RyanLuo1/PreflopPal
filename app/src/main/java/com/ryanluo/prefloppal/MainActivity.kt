@@ -108,10 +108,17 @@ class MainActivity : AppCompatActivity() {
             val position = positionDropdown.text.toString()
             val previousAction = previousActionInput.text.toString()
 
+            // Check if all required inputs are provided
             if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position" && position != "") {
-                val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction)
-                showAdvicePopup(advice, explanation, handStrength)
+                // Additional check for BB position and empty previous action
+                if (position == "BB" && previousAction.isEmpty()) {
+                    Toast.makeText(this, "BB can't be RFI, please input previous action", Toast.LENGTH_LONG).show()
+                } else {
+                    val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction)
+                    showAdvicePopup(advice, explanation, handStrength)
+                }
             } else {
+                // Handle missing input cases
                 val missingItems = mutableListOf<String>()
                 if (card1.isEmpty() || card2.isEmpty()) missingItems.add("cards")
                 if (position == "Select Position" || position == "") missingItems.add("position")
@@ -121,6 +128,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun getAdviceAndStrength(card1: String, card2: String, position: String, previousAction: String): Triple<String, String, Double> {
         val hand = Hand(Card(card1[0], card1[1]), Card(card2[0], card2[1]))

@@ -5,7 +5,7 @@ object RFICallingRanges {
         "MP" to mapOf(
             "UTG" to Range(setOf(
                 "JJ", "TT", "99", "88", "77", "66",
-                "AQs", "AJs", "ATs", "KQs",
+                 "AQs","AJs", "ATs", "KQs",
                 "JTs", "T9s", "98s",
                 "AQo"
             ))
