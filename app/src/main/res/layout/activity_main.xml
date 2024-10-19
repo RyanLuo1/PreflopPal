@@ -22,9 +22,9 @@
             android:layout_gravity="center"
             android:text="PreFlop Pal"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="32sp"
             android:textStyle="bold"
-            android:fontFamily="roboto"/>
+            android:fontFamily="@font/nunito_bold"/>
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -48,10 +48,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:text="Select Your Hand"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp" />
+                android:textSize="24sp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/roboto_regular"/>
 
             <LinearLayout
                 android:id="@+id/cardSelectionLayout"
@@ -111,10 +113,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:text="Your Position"
                 android:textColor="@color/dark_purple"
                 android:textSize="18sp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/roboto_regular"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/positionDropdownLayout"
@@ -157,10 +161,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:text="Previous Action"
                 android:textColor="@color/dark_purple"
                 android:textSize="18sp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/roboto_regular"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/previousActionLayout"
