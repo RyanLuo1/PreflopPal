@@ -159,7 +159,7 @@ object PokerLogic {
                         threeBetRange.valueRange.contains(hand) -> {
                             advice = "3-Bet for Value"
                             explanation = "This hand ($handKey) is strong enough to 3-bet for value against a raise from $raiserPosition when you're in $position. " +
-                                    "A value 3-bet here aims to get more chips into the pot with a hand that performs well postflop if called."
+                                    "A value 3-bet here aims to get more chips into the pot with a hand that performs well postflop."
                         }
                         threeBetRange.bluffRange.contains(hand) -> {
                             advice = "3-Bet as a Bluff or Fold"
