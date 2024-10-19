@@ -1,6 +1,7 @@
 package com.ryanluo.prefloppal
 
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 data class Card(val rank: Char, val suit: Char) {
     override fun toString() = "$rank$suit"
@@ -186,22 +187,24 @@ object PokerLogic {
 
         fun calculateBaseStrength(hand: Hand): Double {
             return when {
+                // High pairs get high base scores
                 hand.isPair -> 6.0 + (14 - rankOrder.indexOf(hand.card1.rank)) * 0.3
+                // Non-pairs are rated by their card ranks
                 else -> {
                     val highCardRank = minOf(rankOrder.indexOf(hand.card1.rank), rankOrder.indexOf(hand.card2.rank))
                     val lowCardRank = maxOf(rankOrder.indexOf(hand.card1.rank), rankOrder.indexOf(hand.card2.rank))
-                    5.0 + (14 - highCardRank) * 0.2 + (14 - lowCardRank) * 0.1
+                    4.5 + (14 - highCardRank) * 0.2 + (14 - lowCardRank) * 0.1
                 }
             }
         }
 
         fun getPositionMultiplier(position: String): Double {
             return when (position) {
-                "BTN" -> 1.2
-                "CO" -> 1.15
-                "MP" -> 1.1
-                "UTG" -> 1.0
-                "SB" -> 0.95
+                "BTN" -> 1.1
+                "CO" -> 1.05
+                "MP" -> 1.0
+                "UTG" -> 0.95
+                "SB" -> 0.85
                 "BB" -> 0.9
                 else -> 1.0
             }
@@ -213,17 +216,72 @@ object PokerLogic {
             val rank2 = rankOrder.indexOf(hand.card2.rank)
             val gap = abs(rank1 - rank2)
             return when {
-                gap == 1 -> 0.5  // Connector
-                gap == 2 -> 0.3  // One-gapper
+                gap == 1 -> 0.4  // Connector
+                gap == 2 -> 0.2  // One-gapper
                 gap == 3 -> 0.1  // Two-gapper
                 else -> 0.0
             }
         }
 
+        fun getBroadwayBonus(hand: Hand): Double {
+            val isBroadway1 = hand.card1.rank in listOf('A', 'K', 'Q', 'J', 'T')
+            val isBroadway2 = hand.card2.rank in listOf('A', 'K', 'Q', 'J', 'T')
+            return when {
+                isBroadway1 && isBroadway2 -> 0.4
+                isBroadway1 || isBroadway2 -> 0.1
+                else -> 0.0
+            }
+        }
+
+        fun getSuitednessBonus(hand: Hand): Double {
+            // If the hand is suited and one of the cards is an Ace, apply a bonus of 1.0
+            return when {
+                hand.isSuited && (hand.card1.rank == 'A' || hand.card2.rank == 'A') -> 1.4
+                hand.isSuited -> 0.5
+                else -> 0.0
+            }
+        }
+
+        fun getLowCardPenalty(hand: Hand): Double {
+            val rank1 = rankOrder.indexOf(hand.card1.rank)
+            val rank2 = rankOrder.indexOf(hand.card2.rank)
+
+            // Check if one of the cards is an Ace
+            val hasAce = hand.card1.rank == 'A' || hand.card2.rank == 'A'
+
+            // Calculate the base penalty for low cards
+            val basePenalty = when {
+                rank1 >= 8 && rank2 >= 8 -> 2.0  // Heavy penalty for very low cards like 7-2
+                rank1 >= 6 && rank2 >= 6 -> 1.5  // Moderate penalty for hands like 8-5
+                rank1 >= 4 && rank2 >= 4 -> 1.0  // Smaller penalty for hands like 6-4
+                else -> 0.0
+            }
+
+            // If there's an Ace, halve the penalty
+            return if (hasAce) basePenalty / 2 else basePenalty
+        }
+
+        fun getDisconnectedPenalty(hand: Hand): Double {
+            if (hand.isPair) return 0.0
+            val rank1 = rankOrder.indexOf(hand.card1.rank)
+            val rank2 = rankOrder.indexOf(hand.card2.rank)
+            val gap = abs(rank1 - rank2)
+
+            // Apply a penalty starting at 1.5 for a gap of 4, with an additional 0.3 per rank beyond that.
+            return if (gap >= 4) 1.5 + (gap - 4) * 0.3 else 0.0
+        }
+
         val baseStrength = calculateBaseStrength(hand)
         val positionMultiplier = getPositionMultiplier(position)
-        val suitednessBonus = if (hand.isSuited) 0.5 else 0.0
+        val suitednessBonus = getSuitednessBonus(hand)
         val connectorBonus = getConnectorBonus(hand)
-        return (baseStrength * positionMultiplier + suitednessBonus + connectorBonus).coerceIn(0.0, 10.0)
+        val broadwayBonus = getBroadwayBonus(hand)
+        val lowCardPenalty = getLowCardPenalty(hand)
+        val disconnectedPenalty = getDisconnectedPenalty(hand)
+
+        // Adjust the raw strength based on bonuses and penalties
+        val rawStrength = (baseStrength * positionMultiplier + suitednessBonus + connectorBonus + broadwayBonus - lowCardPenalty - disconnectedPenalty).coerceIn(0.0, 10.0)
+        return (rawStrength * 10).roundToInt() / 10.0
     }
+
 }
