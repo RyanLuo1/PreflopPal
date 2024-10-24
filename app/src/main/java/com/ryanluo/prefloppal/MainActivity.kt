@@ -1,11 +1,16 @@
 package com.ryanluo.prefloppal
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -25,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         setupToolbar()
         setupCardSelection()
         setupPositionDropdown()
+        setupPositionInfo()
         setupPreviousActionInput()
         setupGetAdviceButton()
         setupBottomNavigation()
@@ -61,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupPositionDropdown() {
-        val positions = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+        val positions = listOf("UTG", "MP", "CO", "BTN", "SB" , "BB")
         val adapter = ArrayAdapter(this, R.layout.position_dropdown, positions)
         positionDropdown = findViewById(R.id.positionDropdown)
         positionDropdown.setAdapter(adapter)
@@ -70,6 +76,30 @@ class MainActivity : AppCompatActivity() {
             val selectedPosition = positions[position]
             updatePreviousActionInput(selectedPosition)
         }
+    }
+
+    private fun setupPositionInfo() {
+        val infoIcon = findViewById<ImageView>(R.id.positionInfoIcon)
+        infoIcon.setOnClickListener {
+            showPositionInfoDialog()
+        }
+    }
+
+    private fun showPositionInfoDialog() {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.position_info_image)
+
+        dialog.window?.apply {
+            setLayout(
+                //(resources.displayMetrics.widthPixels * 0.9).toInt(),
+                //(resources.displayMetrics.heightPixels * 0.5).toInt()
+                1000, 800
+            )
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+        dialog.setCanceledOnTouchOutside(true)
+
+        dialog.show()
     }
 
     private fun setupPreviousActionInput() {

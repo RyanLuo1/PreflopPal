@@ -110,15 +110,31 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Your Position"
-                android:textColor="@color/dark_purple"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp"
-                android:fontFamily="@font/roboto_regular"/>
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="Your Position"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_regular"/>
+
+                <ImageView
+                    android:id="@+id/positionInfoIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_info"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:tint="@color/dark_purple" />
+
+            </RelativeLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/positionDropdownLayout"
@@ -127,7 +143,6 @@
                 android:layout_height="wrap_content"
                 app:boxStrokeColor="@color/primary_purple"
                 app:hintTextColor="@color/medium_purple">
-
 
                 <AutoCompleteTextView
                     android:id="@+id/positionDropdown"
