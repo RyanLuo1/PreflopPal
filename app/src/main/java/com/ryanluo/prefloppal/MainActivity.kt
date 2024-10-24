@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -86,19 +88,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPositionInfoDialog() {
-        val dialog = Dialog(this)
+        val dialog = Dialog(this, R.style.DialogTheme)
         dialog.setContentView(R.layout.position_info_image)
 
-        dialog.window?.apply {
-            setLayout(
-                //(resources.displayMetrics.widthPixels * 0.9).toInt(),
-                //(resources.displayMetrics.heightPixels * 0.5).toInt()
-                1000, 800
-            )
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
-        dialog.setCanceledOnTouchOutside(true)
+        // Get screen dimensions
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val dialogWidth = (screenWidth * 0.90).toInt()
 
+        dialog.window?.apply {
+            setLayout(dialogWidth, WindowManager.LayoutParams.WRAP_CONTENT)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            // Set the dialog position
+            attributes?.apply {
+                gravity = Gravity.CENTER  // This centers the dialog
+                windowAnimations = 0  // Remove default animations
+            }
+
+            // Optional dim background
+            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            setDimAmount(0.5f)
+        }
+
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setCancelable(true)
         dialog.show()
     }
 

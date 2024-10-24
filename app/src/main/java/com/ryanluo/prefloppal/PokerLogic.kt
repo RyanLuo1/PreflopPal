@@ -52,12 +52,12 @@ object PokerLogic {
             "mp" to "MP", "mp+1" to "MP", "hj" to "MP",
             "co" to "CO", "cutoff" to "CO",
             "btn" to "BTN", "button" to "BTN",
-            "sb" to "SB", "smallblind" to "SB",
-            "bb" to "BB", "bigblind" to "BB"
+            "sb" to "SB", "small blind" to "SB",
+            "bb" to "BB", "big blind" to "BB"
         )
         val actionKeywords = mapOf(
             "folds" to "folds", "fold" to "folds", "folded" to "folds",
-            "raises" to "raises", "raise" to "raises", "raised" to "raises",
+            "raises" to "raises", "raise" to "raises", "raised" to "raises", "opens" to "raises", "open" to "raises",
             "3 bets" to "3-bets", "3bet" to "3-bets", "3-bet" to "3-bets", "3 bet" to "3-bets", "3!" to "3-bets"
         )
 
