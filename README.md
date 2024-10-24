@@ -2,7 +2,11 @@
 
 ## Overview
 
-The Preflop Pal is designed to introduce new players to correct preflop play in Texas Hold'em poker. This tool aims to make learning optimal preflop strategies easier by providing a simple, user-friendly interface, in contrast to modern solvers which can be complex and difficult to read.
+Preflop Pal is designed to introduce new players to correct preflop play in Texas Hold'em poker. This tool aims to make learning optimal preflop strategies easier by providing a simple, user-friendly interface, in contrast to modern solvers/charts which can be complex and difficult to read. Instead of relying on real-time solver calculations, Preflop Pal uses carefully curated premapped ranges to offer precise, 1:1 tailored guidance that is easy to understand and apply.
+
+## Why Use This Tool?
+
+Modern poker solvers, while powerful, are often too complex for beginner players to effectively use. The Preflop Pal distills essential preflop strategies into a format that’s easy to understand and implement. This makes learning poker more approachable, while still providing valuable insights into correct play.
 
 ## Key Features
 
@@ -10,7 +14,7 @@ The Preflop Pal is designed to introduce new players to correct preflop play in 
 Intuitive interface designed for players new to the game or to preflop strategies.
 
 ### Simplified Input System: 
-Easy-to-use controls for inputting hand ranges and positions, allowing users to focus on learning rather than navigating complicated settings.
+Easy-to-use controls for inputting hand ranges, positions, and any previous actions beforehand, allowing users to focus on learning rather than navigating complicated settings.
 
 ### Actionable Advice: 
 Offers suggestions based on optimal preflop strategies, helping users understand when to fold, raise, or call based on their position and hand strength
@@ -19,7 +23,7 @@ Offers suggestions based on optimal preflop strategies, helping users understand
 Unlike traditional solvers, this tool focuses on teaching players the logic behind preflop decisions, helping them build a solid foundation for post-flop play.
 
 ### Visual Hand Ranges: 
-Color-coded hand ranges make it easy to understand which hands to play in various positions without needing to memorize complex charts.
+Color-coded hand ranges and actions make it easy to understand which hands to play in various positions without needing to memorize complex charts.
 
 
 ## Getting Started
@@ -33,15 +37,14 @@ Enter your hole cards using the simple input feature.
 ### Choose Your Position: 
 Select your position at the table (e.g., small blind, big blind, early position, etc.)
 
+### Input Previous Action
+Preflop Pal’s natural language input lets you easily describe actions like "UTG raises, CO calls" or "everyone folds." Simply describe the action as you would to a friend.
+
 ### Learn and Practice: 
-The system will guide you through what action to take (raise, fold, call) based on optimal preflop strategy from modern solvers for your position and hand.
+The system will guide you through what action to take (raise, fold, call) based on optimal preflop strategy from GTO theory for your position and hand.
 
 ### Adjust Settings: 
 Customize settings to simulate different game scenarios, such as number of players, stakes, or common table tendencies. (Still in Progress)
-
-## Why Use This Tool?
-
-Modern poker solvers, while powerful, are often too complex for beginner players to effectively use. The Preflop Pal distills essential preflop strategies into a format that’s easy to understand and implement. This makes learning poker more approachable, while still providing valuable insights into correct play.
 
 ## Future Plans
 
