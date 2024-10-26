@@ -1,6 +1,6 @@
 package com.ryanluo.prefloppal
 
-object RFI_Ranges{
+object Six_Max_RFI_Ranges{
 
     val POSITIONS = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
 

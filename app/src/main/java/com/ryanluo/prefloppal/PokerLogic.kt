@@ -37,7 +37,7 @@ class Range(private val hands: Set<String>) {
 object PokerLogic {
     private val POSITIONS = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
 
-    private val RFI_RANGES = RFI_Ranges.RFI_RANGES
+    private val RFI_RANGES = Six_Max_RFI_Ranges.RFI_RANGES
     private val CALLING_RANGES = RFICallingRanges.RANGES
     private val THREE_BET_RANGES = RFIThreeBetRanges.RANGES
 

@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        findViewById<TextView>(R.id.toolbarTitle).text = "PreFlop Pal"
+        //findViewById<TextView>(R.id.toolbarTitle).text = "PreFlop Pal"
     }
 
     private fun setupCardSelection() {

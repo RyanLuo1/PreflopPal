@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_gradient_background"
+    android:background="@color/light_purple"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -13,18 +13,18 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary_purple"
+        android:paddingTop="8dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/toolbarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/toolbarLogo"
+            android:layout_width="250dp"
+            android:layout_height="72dp"
             android:layout_gravity="center"
-            android:text="PreFlop Pal"
-            android:textColor="@color/white"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/nunito_bold"/>
+            android:src="@drawable/text_only"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:padding="4dp"/>
 
     </androidx.appcompat.widget.Toolbar>
 
