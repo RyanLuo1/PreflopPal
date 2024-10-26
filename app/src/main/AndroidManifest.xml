@@ -12,7 +12,7 @@
 
         <!-- Welcome Activity (First screen with logo and buttons) -->
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".auth.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,17 +22,17 @@
 
         <!-- Login Activity -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".auth.LoginActivity"
             android:exported="false"/>
 
         <!-- Sign Up Activity -->
         <activity
-            android:name=".SignUpActivity"
+            android:name=".auth.SignUpActivity"
             android:exported="false"/>
 
         <!-- Main Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:exported="false"/>
 
     </application>

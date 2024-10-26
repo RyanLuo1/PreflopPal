@@ -1,4 +1,4 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.dialogs
 
 import android.app.Dialog
 import android.graphics.Typeface

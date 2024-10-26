@@ -1,10 +1,11 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.auth
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
+import com.ryanluo.prefloppal.R
 
 class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

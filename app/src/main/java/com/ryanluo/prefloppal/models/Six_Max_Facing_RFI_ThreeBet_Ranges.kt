@@ -1,4 +1,6 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.models
+
+import com.ryanluo.prefloppal.utils.Range
 
 object RFIThreeBetRanges {
     data class ThreeBetRange(val valueRange: Range, val bluffRange: Range)

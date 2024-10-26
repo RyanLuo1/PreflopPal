@@ -1,4 +1,4 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.main
 
 import android.app.Dialog
 import android.content.Context
@@ -14,11 +14,16 @@ import android.widget.AutoCompleteTextView
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
+import com.ryanluo.prefloppal.dialogs.AdviceDialogFragment
+import com.ryanluo.prefloppal.utils.Card
+import com.ryanluo.prefloppal.dialogs.CardSelectionDialog
+import com.ryanluo.prefloppal.utils.Hand
+import com.ryanluo.prefloppal.utils.PokerLogic
+import com.ryanluo.prefloppal.R
 
 class MainActivity : AppCompatActivity() {
     private lateinit var card1TextView: TextView
@@ -193,7 +198,8 @@ class MainActivity : AppCompatActivity() {
         val strengthPercentage = (handStrength * 10).toInt()
         val strengthText = String.format("%.1f / 10.0", handStrength)
 
-        val dialog = AdviceDialogFragment.newInstance(advice, explanation, strengthPercentage, strengthText)
+        val dialog =
+            AdviceDialogFragment.newInstance(advice, explanation, strengthPercentage, strengthText)
         dialog.show(supportFragmentManager, "AdviceDialog")
     }
 

@@ -1,4 +1,4 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.auth
 
 import android.content.Context
 import android.content.Intent
@@ -11,24 +11,32 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.ryanluo.prefloppal.R
+import com.ryanluo.prefloppal.utils.FirebaseManager
+import com.ryanluo.prefloppal.main.MainActivity
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var emailInputLayout: TextInputLayout
     private lateinit var passwordInputLayout: TextInputLayout
     private lateinit var confirmPasswordInputLayout: TextInputLayout
+    private lateinit var firebaseManager: FirebaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.signup_activity)
 
+        // Initialize FirebaseManager
+        firebaseManager = FirebaseManager.getInstance()
+
+        // Back button logic
         findViewById<ImageView>(R.id.backButton).setOnClickListener {
             finish()
         }
 
+        // Initialize input layouts and fields
         emailInputLayout = findViewById(R.id.emailInputLayout)
         passwordInputLayout = findViewById(R.id.passwordInputLayout)
         confirmPasswordInputLayout = findViewById(R.id.confirmPasswordInputLayout)
-
         val emailInput = findViewById<TextInputEditText>(R.id.emailInput)
         val passwordInput = findViewById<TextInputEditText>(R.id.passwordInput)
         val confirmPasswordInput = findViewById<TextInputEditText>(R.id.confirmPasswordInput)
@@ -69,8 +77,23 @@ class SignUpActivity : AppCompatActivity() {
             val confirmPassword = confirmPasswordInput.text.toString()
 
             if (validateInput(email, password, confirmPassword)) {
-                // TODO: Implement actual signup logic
-                Toast.makeText(this, "Sign up functionality coming soon!", Toast.LENGTH_SHORT).show()
+                // Show loading indicator and disable button to prevent multiple clicks
+                signUpButton.isEnabled = false
+
+                // Call FirebaseManager to create a new user
+                firebaseManager.createUser(email, password) { success, error ->
+                    runOnUiThread {
+                        signUpButton.isEnabled = true
+                        if (success) {
+                            // Navigate to main activity on successful sign-up
+                            MainActivity.startActivity(this)
+                            finish()
+                        } else {
+                            // Show error message if sign-up fails
+                            Toast.makeText(this, error ?: "Sign up failed", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
             }
         }
     }

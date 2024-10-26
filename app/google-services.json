@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "374874049326",
+    "project_id": "preflop-pal",
+    "storage_bucket": "preflop-pal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374874049326:android:44d27675d7dce046cb88bf",
+        "android_client_info": {
+          "package_name": "com.ryanluo.prefloppal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDutnp1Tnp2kN1JOTevA0qYh8HLyfKJaog"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

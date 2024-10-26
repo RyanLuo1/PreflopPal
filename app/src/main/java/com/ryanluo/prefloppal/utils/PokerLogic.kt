@@ -1,5 +1,9 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.utils
 
+import com.ryanluo.prefloppal.models.FacingThreeBetRanges
+import com.ryanluo.prefloppal.models.RFICallingRanges
+import com.ryanluo.prefloppal.models.RFIThreeBetRanges
+import com.ryanluo.prefloppal.models.Six_Max_RFI_Ranges
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

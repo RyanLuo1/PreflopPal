@@ -1,4 +1,4 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.auth
 
 import android.content.Context
 import android.content.Intent
@@ -11,19 +11,28 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.ryanluo.prefloppal.main.MainActivity
+import com.ryanluo.prefloppal.R
+import com.ryanluo.prefloppal.utils.FirebaseManager
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var emailInputLayout: TextInputLayout
     private lateinit var passwordInputLayout: TextInputLayout
+    private lateinit var firebaseManager: FirebaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity)
 
+        // Initialize FirebaseManager
+        firebaseManager = FirebaseManager.getInstance()
+
+        // Back button logic
         findViewById<ImageView>(R.id.backButton).setOnClickListener {
             finish()
         }
 
+        // Initialize input layouts and fields
         emailInputLayout = findViewById(R.id.emailInputLayout)
         passwordInputLayout = findViewById(R.id.passwordInputLayout)
         val emailInput = findViewById<TextInputEditText>(R.id.emailInput)
@@ -52,9 +61,24 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordInput.text.toString()
 
             if (validateInput(email, password)) {
-                // TODO: Implement actual login logic
-                MainActivity.startActivity(this)
-                finish()
+                // Disable the login button to prevent multiple clicks during the login process
+                loginButton.isEnabled = false
+
+                // Call FirebaseManager to sign in the user
+                firebaseManager.signIn(email, password) { success, error ->
+                    runOnUiThread {
+                        // Re-enable the login button after the sign-in process is complete
+                        loginButton.isEnabled = true
+                        if (success) {
+                            // Navigate to MainActivity on successful login
+                            MainActivity.startActivity(this)
+                            finish()
+                        } else {
+                            // Show error message if login fails
+                            Toast.makeText(this, error ?: "Login failed", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
             }
         }
     }

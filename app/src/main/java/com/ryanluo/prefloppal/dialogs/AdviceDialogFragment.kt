@@ -1,4 +1,4 @@
-package com.ryanluo.prefloppal
+package com.ryanluo.prefloppal.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ryanluo.prefloppal.R
 
 class AdviceDialogFragment : DialogFragment() {
 
