@@ -1,6 +1,8 @@
 package com.ryanluo.prefloppal
 
 import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -24,6 +26,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var positionDropdown: AutoCompleteTextView
     private lateinit var previousActionInput: AutoCompleteTextView
     private lateinit var getAdviceButton: MaterialButton
+
+
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, MainActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
