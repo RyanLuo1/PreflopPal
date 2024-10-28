@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="@color/background_light_lavender">
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/handTextView"

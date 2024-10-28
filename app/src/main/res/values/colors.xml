@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
         <color name="primary_purple">#764fe4</color>
-        <color name="dark_purple">#2e214a</color>
+        <color name="dark_purple">#371178</color>
         <color name="light_purple">#E9DFFF</color>
         <color name="medium_purple">#9D88E4</color>
         <color name="background_light_lavender">#f9f8fc</color>

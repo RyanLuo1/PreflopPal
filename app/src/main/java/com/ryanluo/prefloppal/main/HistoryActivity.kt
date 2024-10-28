@@ -26,7 +26,7 @@ class HistoryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_history)
+        setContentView(R.layout.history_activity)
 
         // Initialize Firebase manager
         firebaseManager = FirebaseManager.getInstance()
@@ -79,7 +79,7 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun showHandDetails(record: HandRecord) {
         val dialog = Dialog(this)
-        dialog.setContentView(R.layout.dialog_hand_details)
+        dialog.setContentView(R.layout.dialog_hand_history_details)
 
         dialog.window?.apply {
             setLayout(
