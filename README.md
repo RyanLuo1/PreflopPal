@@ -43,6 +43,9 @@ Preflop Pal’s natural language input lets you easily describe actions like "UT
 ### Learn and Practice: 
 The system will guide you through what action to take (raise, fold, call) based on optimal preflop strategy from GTO theory for your position and hand.
 
+### History
+The Hand History feature automatically stores every hand for which users request advice, capturing details like cards, position, previous actions, and the provided guidance. This allows users to easily review past decisions, learn from their play, and continuously improve their strategy over time.
+
 ### Adjust Settings: 
 Customize settings to simulate different game scenarios, such as number of players, stakes, or common table tendencies. (Still in Progress)
 
