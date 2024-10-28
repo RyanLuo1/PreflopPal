@@ -2,6 +2,7 @@ package com.ryanluo.prefloppal.main
 
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -19,6 +21,8 @@ import com.ryanluo.prefloppal.utils.FirebaseManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 
 class HistoryActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -35,43 +39,18 @@ class HistoryActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.historyRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Set up bottom navigation
-        setupBottomNavigation()
-
         // Load hand history
         loadHandHistory()
-    }
 
-    private fun setupBottomNavigation() {
-        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+        setupSwipeToDelete()
 
-        // Set the History item as selected
-        bottomNavigation.selectedItemId = R.id.navigation_history
-
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when(item.itemId) {
-                R.id.navigation_home -> {
-                    // Go back to MainActivity
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
-                    true
-                }
-                R.id.navigation_learn -> {
-                    Toast.makeText(this, "Learn feature coming soon!", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.navigation_history -> {
-                    // Already on history screen
-                    true
-                }
-                else -> false
-            }
-        }
+        // Set up bottom navigation
+        setupBottomNavigation()
     }
 
     private fun loadHandHistory() {
         firebaseManager.getHandHistory { handRecords ->
-            recyclerView.adapter = HandHistoryAdapter(handRecords) { record ->
+            recyclerView.adapter = HandHistoryAdapter(ArrayList(handRecords)) { record ->
                 showHandDetails(record)
             }
         }
@@ -100,5 +79,128 @@ class HistoryActivity : AppCompatActivity() {
 
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
+    }
+
+    private fun setupSwipeToDelete() {
+        val swipeHandler = object : ItemTouchHelper.SimpleCallback(
+            0,  // Drag directions (none)
+            ItemTouchHelper.LEFT  // Only allow left swipe
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val adapter = recyclerView.adapter as HandHistoryAdapter
+                val record = adapter.getItem(position)
+
+                AlertDialog.Builder(this@HistoryActivity)
+                    .setTitle("Delete Hand History")
+                    .setMessage("Are you sure you want to delete this hand record?")
+                    .setPositiveButton("Delete") { _, _ ->
+                        firebaseManager.deleteHandRecord(record.id) { success ->
+                            runOnUiThread {
+                                if (success) {
+                                    adapter.removeItem(position)
+                                    Toast.makeText(
+                                        this@HistoryActivity,
+                                        "Hand record deleted",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    adapter.notifyItemChanged(position)
+                                    Toast.makeText(
+                                        this@HistoryActivity,
+                                        "Failed to delete hand record",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
+                    .setNegativeButton("Cancel") { _, _ ->
+                        adapter.notifyItemChanged(position)
+                    }
+                    .setOnCancelListener {
+                        adapter.notifyItemChanged(position)
+                    }
+                    .show()
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                // Only show if swiping left (dX will be negative)
+                if (dX < 0) {
+                    val itemView = viewHolder.itemView
+                    val deleteIcon = ContextCompat.getDrawable(
+                        this@HistoryActivity,
+                        R.drawable.ic_delete
+                    )
+                    val background = ColorDrawable(Color.RED)
+
+                    val iconMargin = (itemView.height - deleteIcon!!.intrinsicHeight) / 2
+                    val iconTop = itemView.top + iconMargin
+                    val iconBottom = iconTop + deleteIcon.intrinsicHeight
+
+                    val iconRight = itemView.right - iconMargin
+                    val iconLeft = iconRight - deleteIcon.intrinsicWidth
+                    deleteIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+
+                    background.setBounds(
+                        itemView.right + dX.toInt(),
+                        itemView.top,
+                        itemView.right,
+                        itemView.bottom
+                    )
+
+                    background.draw(c)
+                    deleteIcon.draw(c)
+                }
+
+                super.onChildDraw(
+                    c, recyclerView, viewHolder,
+                    dX, dY, actionState, isCurrentlyActive
+                )
+            }
+        }
+
+        ItemTouchHelper(swipeHandler).attachToRecyclerView(recyclerView)
+    }
+
+    private fun setupBottomNavigation() {
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+
+        // Set the History item as selected
+        bottomNavigation.selectedItemId = R.id.navigation_history
+
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when(item.itemId) {
+                R.id.navigation_home -> {
+                    // Go back to MainActivity
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.navigation_learn -> {
+                    Toast.makeText(this, "Learn feature coming soon!", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.navigation_history -> {
+                    // Already on history screen
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ import java.util.Date
 import java.util.Locale
 
 class HandHistoryAdapter(
-    private val handRecords: List<HandRecord>,
+    private val handRecords: ArrayList<HandRecord>,  // Changed to ArrayList
     private val onItemClick: (HandRecord) -> Unit
 ) : RecyclerView.Adapter<HandHistoryAdapter.ViewHolder>() {
 
@@ -41,4 +41,11 @@ class HandHistoryAdapter(
     }
 
     override fun getItemCount() = handRecords.size
+
+    fun getItem(position: Int): HandRecord = handRecords[position]
+
+    fun removeItem(position: Int) {
+        handRecords.removeAt(position)
+        notifyItemRemoved(position)
+    }
 }

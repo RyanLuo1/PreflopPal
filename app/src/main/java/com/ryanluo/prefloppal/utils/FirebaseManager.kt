@@ -90,7 +90,6 @@ class FirebaseManager private constructor() {
             })
     }
 
-    // In FirebaseManager.kt
     fun saveHandRecord(handRecord: HandRecord, callback: (Boolean) -> Unit) {
         val userId = auth.currentUser?.uid ?: return
         val handKey = database.child("users").child(userId).child("handHistory").push().key
@@ -103,5 +102,14 @@ class FirebaseManager private constructor() {
                     callback(task.isSuccessful)
                 }
         } ?: callback(false)
+    }
+
+    fun deleteHandRecord(handId: String, callback: (Boolean) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return
+        database.child("users").child(userId).child("handHistory").child(handId)
+            .removeValue()
+            .addOnCompleteListener { task ->
+                callback(task.isSuccessful)
+            }
     }
 }
