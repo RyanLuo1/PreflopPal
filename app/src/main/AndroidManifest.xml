@@ -35,6 +35,11 @@
             android:name=".main.MainActivity"
             android:exported="false"/>
 
+        <!-- History Activity -->
+        <activity
+            android:name=".main.HistoryActivity"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

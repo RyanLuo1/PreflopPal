@@ -24,6 +24,8 @@ import com.ryanluo.prefloppal.dialogs.CardSelectionDialog
 import com.ryanluo.prefloppal.utils.Hand
 import com.ryanluo.prefloppal.utils.PokerLogic
 import com.ryanluo.prefloppal.R
+import com.ryanluo.prefloppal.data.HandRecord
+import com.ryanluo.prefloppal.utils.FirebaseManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var card1TextView: TextView
@@ -31,18 +33,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var positionDropdown: AutoCompleteTextView
     private lateinit var previousActionInput: AutoCompleteTextView
     private lateinit var getAdviceButton: MaterialButton
-
-
-    companion object {
-        fun startActivity(context: Context) {
-            val intent = Intent(context, MainActivity::class.java)
-            context.startActivity(intent)
-        }
-    }
+    private lateinit var firebaseManager: FirebaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        firebaseManager = FirebaseManager.getInstance()
 
         setupToolbar()
         setupCardSelection()
@@ -167,17 +164,31 @@ class MainActivity : AppCompatActivity() {
             val position = positionDropdown.text.toString()
             val previousAction = previousActionInput.text.toString()
 
-            // Check if all required inputs are provided
             if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position" && position != "") {
-                // Additional check for BB position and empty previous action
-                if (position == "BB" && previousAction.isEmpty()) {
-                    Toast.makeText(this, "BB can't be RFI, please input previous action", Toast.LENGTH_LONG).show()
-                } else {
-                    val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction)
-                    showAdvicePopup(advice, explanation, handStrength)
+                val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction)
+
+                // Create and save the hand record
+                val handRecord = HandRecord(
+                    card1 = card1,
+                    card2 = card2,
+                    position = position,
+                    previousAction = previousAction,
+                    advice = advice,
+                    timestamp = System.currentTimeMillis()
+                )
+
+                // Save to Firebase
+                firebaseManager.saveHandRecord(handRecord) { success ->
+                    if (!success) {
+                        runOnUiThread {
+                            Toast.makeText(this, "Failed to save hand record", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
+
+                // Show advice popup
+                showAdvicePopup(advice, explanation, handStrength)
             } else {
-                // Handle missing input cases
                 val missingItems = mutableListOf<String>()
                 if (card1.isEmpty() || card2.isEmpty()) missingItems.add("cards")
                 if (position == "Select Position" || position == "") missingItems.add("position")
@@ -208,7 +219,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener { item ->
             when(item.itemId) {
                 R.id.navigation_home -> {
-                    // Handle home navigation
+                    // Already on home screen
                     true
                 }
                 R.id.navigation_learn -> {
@@ -217,10 +228,18 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_history -> {
                     // Handle history navigation
+                    startActivity(Intent(this, HistoryActivity::class.java))
                     true
                 }
                 else -> false
             }
+        }
+    }
+
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, MainActivity::class.java)
+            context.startActivity(intent)
         }
     }
 }
