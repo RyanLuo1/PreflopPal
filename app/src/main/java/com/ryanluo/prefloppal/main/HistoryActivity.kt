@@ -4,8 +4,10 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
@@ -97,9 +99,18 @@ class HistoryActivity : AppCompatActivity() {
                 val adapter = recyclerView.adapter as HandHistoryAdapter
                 val record = adapter.getItem(position)
 
+                // Create a custom TextView for the title
+                val title = TextView(this@HistoryActivity).apply {
+                    text = "Delete Hand History"
+                    textSize = 20f
+                    setTypeface(typeface, Typeface.BOLD)  // Make text bold
+                    setPadding(16, 16, 16, 16)
+                    gravity = Gravity.CENTER
+                }
+
                 AlertDialog.Builder(this@HistoryActivity)
-                    .setTitle("Delete Hand History")
-                    .setMessage("Are you sure you want to delete this hand record?")
+                    .setCustomTitle(title)
+                    .setMessage("Are you sure you want to delete this hand history?")
                     .setPositiveButton("Delete") { _, _ ->
                         firebaseManager.deleteHandRecord(record.id) { success ->
                             runOnUiThread {
@@ -188,6 +199,7 @@ class HistoryActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     // Go back to MainActivity
                     startActivity(Intent(this, MainActivity::class.java))
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
                     finish()
                     true
                 }
