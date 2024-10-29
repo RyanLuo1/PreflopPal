@@ -27,6 +27,13 @@
             android:layout_marginBottom="16dp"/>
 
         <TextView
+            android:id="@+id/tableSizeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
             android:id="@+id/positionTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

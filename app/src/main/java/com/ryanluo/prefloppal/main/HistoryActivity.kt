@@ -74,6 +74,7 @@ class HistoryActivity : AppCompatActivity() {
         }
 
         dialog.findViewById<TextView>(R.id.handTextView).text = "${record.card1} ${record.card2}"
+        dialog.findViewById<TextView>(R.id.tableSizeTextView).text = buildBoldText("Table Size: ", record.tableSize)
         dialog.findViewById<TextView>(R.id.positionTextView).text = buildBoldText("Position: ", record.position)
         dialog.findViewById<TextView>(R.id.previousActionTextView).text = buildBoldText("Previous Action: ", record.previousAction)
         dialog.findViewById<TextView>(R.id.adviceTextView).text = buildBoldText("Advice: ", record.advice)

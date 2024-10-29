@@ -223,6 +223,7 @@ class MainActivity : AppCompatActivity() {
                 val handRecord = HandRecord(
                     card1 = card1,
                     card2 = card2,
+                    tableSize = tableSizeText,
                     position = position,
                     previousAction = previousAction,
                     advice = advice,
