@@ -216,6 +216,11 @@ class MainActivity : AppCompatActivity() {
                 else -> TableSize.SIX_MAX // Default to 6 max if something goes wrong
             }
 
+            if (position == "BB" && previousAction.isEmpty()) {
+                Toast.makeText(this, "BB can't be RFI, please input previous action", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position" && position != "") {
                 val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction, tableSize)
 

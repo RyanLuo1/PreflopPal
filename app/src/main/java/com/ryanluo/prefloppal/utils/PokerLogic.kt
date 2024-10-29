@@ -151,6 +151,7 @@ object PokerLogic {
             TableSize.NINE_MAX -> Nine_Max_FacingThreeBetRanges.RANGES
         }
 
+
         when {
             actions.isEmpty() || previousAction.isNullOrBlank() || previousAction == "No action" || actions.all { it.second == "folds" } -> {
                 // RFI situation
