@@ -2,7 +2,7 @@ package com.ryanluo.prefloppal.models
 
 import com.ryanluo.prefloppal.utils.Range
 
-object RFICallingRanges {
+object Six_Max_RFICallingRanges {
     val RANGES = mapOf(
         "MP" to mapOf(
             "UTG" to Range(setOf(

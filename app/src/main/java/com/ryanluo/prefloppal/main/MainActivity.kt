@@ -7,11 +7,13 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.ImageView
+import android.widget.ListPopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +28,7 @@ import com.ryanluo.prefloppal.utils.PokerLogic
 import com.ryanluo.prefloppal.R
 import com.ryanluo.prefloppal.data.HandRecord
 import com.ryanluo.prefloppal.utils.FirebaseManager
+import com.ryanluo.prefloppal.utils.TableSize
 
 class MainActivity : AppCompatActivity() {
     private lateinit var card1TextView: TextView
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         setupToolbar()
         setupCardSelection()
+        setupTableSizeDropdown()
         setupPositionDropdown()
         setupPositionInfo()
         setupPreviousActionInput()
@@ -80,17 +84,56 @@ class MainActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, "CardSelectionDialog")
     }
 
-    private fun setupPositionDropdown() {
-        val positions = listOf("UTG", "MP", "CO", "BTN", "SB" , "BB")
-        val adapter = ArrayAdapter(this, R.layout.position_dropdown, positions)
-        positionDropdown = findViewById(R.id.positionDropdown)
-        positionDropdown.setAdapter(adapter)
+    private fun setupTableSizeDropdown() {
+        val tableSizes = listOf("6 Players", "9 Players")
+        val adapter = ArrayAdapter(this, R.layout.position_dropdown, tableSizes)
+        val tableSizeDropdown = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown)
+        tableSizeDropdown.setAdapter(adapter)
 
-        positionDropdown.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val selectedPosition = positions[position]
-            updatePreviousActionInput(selectedPosition)
+        // Set default value
+        tableSizeDropdown.setText("6 Players", false)
+
+        tableSizeDropdown.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            // Just trigger position dropdown to update based on new table size
+            setupPositionDropdown()
+            // Clear current position selection when table size changes
+            positionDropdown.setText("", false)
         }
     }
+
+
+    private fun setupPositionDropdown() {
+        val tableSizeText = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown).text.toString()
+
+        val positions = when(tableSizeText) {
+            "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
+            else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+        }
+
+        val popup = ListPopupWindow(this)
+        val adapter = ArrayAdapter(this, R.layout.position_dropdown, positions)
+        positionDropdown = findViewById(R.id.positionDropdown)
+
+        popup.apply {
+            anchorView = positionDropdown
+            setAdapter(adapter)
+
+            //height for scrollable menu
+            height = 500 // Replace with desired max height in pixels
+
+            setOnItemClickListener { _, _, position, _ ->
+                val selectedPosition = positions[position]
+                positionDropdown.setText(selectedPosition)
+                updatePreviousActionInput(selectedPosition)
+                dismiss()
+            }
+        }
+
+        positionDropdown.setOnClickListener {
+            popup.show()
+        }
+    }
+
 
     private fun setupPositionInfo() {
         val infoIcon = findViewById<ImageView>(R.id.positionInfoIcon)
@@ -149,6 +192,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
                 previousActionInput.setAdapter(adapter)
+                previousActionInput.dropDownHeight = 290
                 previousActionInput.setText("") // Clear any existing text
                 previousActionInput.isEnabled = true
             }
@@ -161,11 +205,19 @@ class MainActivity : AppCompatActivity() {
         getAdviceButton.setOnClickListener {
             val card1 = card1TextView.text.toString()
             val card2 = card2TextView.text.toString()
+            val tableSizeText = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown).text.toString()
             val position = positionDropdown.text.toString()
             val previousAction = previousActionInput.text.toString()
 
+            // Convert table size text to enum
+            val tableSize = when(tableSizeText) {
+                "6 Players" -> TableSize.SIX_MAX
+                "9 Players" -> TableSize.NINE_MAX
+                else -> TableSize.SIX_MAX // Default to 6 max if something goes wrong
+            }
+
             if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position" && position != "") {
-                val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction)
+                val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction, tableSize)
 
                 // Create and save the hand record
                 val handRecord = HandRecord(
@@ -200,9 +252,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun getAdviceAndStrength(card1: String, card2: String, position: String, previousAction: String): Triple<String, String, Double> {
+    private fun getAdviceAndStrength(card1: String, card2: String, position: String, previousAction: String, tableSize: TableSize): Triple<String, String, Double> {
         val hand = Hand(Card(card1[0], card1[1]), Card(card2[0], card2[1]))
-        return PokerLogic.getAdvice(hand, position, previousAction)
+        return PokerLogic.getAdvice(hand, position, previousAction, tableSize)
     }
 
     private fun showAdvicePopup(advice: String, explanation: String, handStrength: Double) {

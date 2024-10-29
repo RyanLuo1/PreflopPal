@@ -6,7 +6,7 @@ object Six_Max_RFI_Ranges{
 
     val POSITIONS = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
 
-    val RFI_RANGES = mapOf(
+    val RANGES = mapOf(
         "UTG" to Range(setOf(
             "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66",
             "AKs", "AQs", "AJs", "ATs", "A9s", "A5s",

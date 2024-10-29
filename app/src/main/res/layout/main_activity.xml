@@ -8,6 +8,7 @@
     android:background="@color/light_purple"
     tools:context=".main.MainActivity">
 
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -15,6 +16,7 @@
         android:background="@color/primary_purple"
         android:paddingTop="8dp"
         app:layout_constraintTop_toTopOf="parent">
+
 
         <ImageView
             android:id="@+id/toolbarLogo"
@@ -26,7 +28,9 @@
             android:scaleType="fitCenter"
             android:padding="4dp"/>
 
+
     </androidx.appcompat.widget.Toolbar>
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardSelectionContainer"
@@ -39,11 +43,13 @@
         app:cardElevation="12dp"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -55,11 +61,13 @@
                 android:layout_marginBottom="16dp"
                 android:fontFamily="@font/roboto_regular"/>
 
+
             <LinearLayout
                 android:id="@+id/cardSelectionLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
 
                 <TextView
                     android:id="@+id/card1"
@@ -75,6 +83,7 @@
                     android:clickable="true"
                     android:focusable="true" />
 
+
                 <TextView
                     android:id="@+id/card2"
                     android:layout_width="0dp"
@@ -89,9 +98,65 @@
                     android:clickable="true"
                     android:focusable="true" />
 
+
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/tableSizeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/cardSelectionContainer"
+        app:layout_constraintBottom_toTopOf="@id/positionContainer">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Table Size"
+                android:textColor="@color/dark_purple"
+                android:textSize="18sp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/roboto_regular"/>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tableSizeDropdownLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxStrokeColor="@color/primary_purple"
+                app:hintTextColor="@color/medium_purple">
+
+
+                <AutoCompleteTextView
+                    android:id="@+id/tableSizeDropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:hint="Select Table Size"
+                    android:textColor="@color/dark_purple" />
+
+
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/positionContainer"
@@ -102,7 +167,8 @@
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/cardSelectionContainer">
+        app:layout_constraintTop_toBottomOf="@id/tableSizeContainer">
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -110,10 +176,12 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp">
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -123,6 +191,7 @@
                     android:textColor="@color/dark_purple"
                     android:textSize="18sp"
                     android:fontFamily="@font/roboto_regular"/>
+
 
                 <ImageView
                     android:id="@+id/positionInfoIcon"
@@ -134,7 +203,9 @@
                     android:focusable="true"
                     app:tint="@color/dark_purple" />
 
+
             </RelativeLayout>
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/positionDropdownLayout"
@@ -144,17 +215,23 @@
                 app:boxStrokeColor="@color/primary_purple"
                 app:hintTextColor="@color/medium_purple">
 
+
                 <AutoCompleteTextView
                     android:id="@+id/positionDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
                     android:hint="Select Position"
-                    android:textColor="@color/dark_purple" />
+                    android:textColor="@color/dark_purple"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:spinnerMode="dropdown" />
+
 
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/previousActionContainer"
@@ -167,11 +244,13 @@
         app:cardElevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/positionContainer">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -183,6 +262,7 @@
                 android:layout_marginBottom="16dp"
                 android:fontFamily="@font/roboto_regular"/>
 
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/previousActionLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -190,6 +270,7 @@
                 android:layout_height="wrap_content"
                 app:boxStrokeColor="@color/primary_purple"
                 app:hintTextColor="@color/medium_purple">
+
 
                 <AutoCompleteTextView
                     android:id="@+id/previousActionInput"
@@ -199,9 +280,11 @@
                     android:inputType="text"
                     android:textColor="@color/dark_purple" />
 
+
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/getAdviceButton"
@@ -216,6 +299,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/previousActionContainer" />
 
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
@@ -225,5 +309,6 @@
         app:itemTextColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigation_menu" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

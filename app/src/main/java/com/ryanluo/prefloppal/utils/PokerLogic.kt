@@ -1,9 +1,14 @@
 package com.ryanluo.prefloppal.utils
 
-import com.ryanluo.prefloppal.models.FacingThreeBetRanges
-import com.ryanluo.prefloppal.models.RFICallingRanges
-import com.ryanluo.prefloppal.models.RFIThreeBetRanges
+import com.ryanluo.prefloppal.models.Nine_Max_RFICallingRanges
+import com.ryanluo.prefloppal.models.Nine_Max_FacingThreeBetRanges
+import com.ryanluo.prefloppal.models.Nine_Max_RFIThreeBetRanges
+import com.ryanluo.prefloppal.models.Nine_Max_RFI_Ranges
+import com.ryanluo.prefloppal.models.RFIThreeBetRange
+import com.ryanluo.prefloppal.models.Six_Max_RFICallingRanges
+import com.ryanluo.prefloppal.models.Six_Max_RFIThreeBetRanges
 import com.ryanluo.prefloppal.models.Six_Max_RFI_Ranges
+
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -38,12 +43,26 @@ class Range(private val hands: Set<String>) {
     }
 }
 
-object PokerLogic {
-    private val POSITIONS = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+enum class TableSize {
+    SIX_MAX,
+    NINE_MAX
+}
 
-    private val RFI_RANGES = Six_Max_RFI_Ranges.RFI_RANGES
-    private val CALLING_RANGES = RFICallingRanges.RANGES
-    private val THREE_BET_RANGES = RFIThreeBetRanges.RANGES
+object PokerLogic {
+    private val SIX_MAX_POSITIONS = listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+    private val NINE_MAX_POSITIONS = listOf("UTG", "UTG+1", "UTG+2", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB")
+
+    // 6max ranges (your existing ones)
+    private val SIX_MAX_RFI_RANGES = Six_Max_RFI_Ranges.RANGES
+    private val SIX_MAX_CALLING_RANGES = Six_Max_RFICallingRanges.RANGES
+    private val SIX_MAX_THREE_BET_RANGES = Six_Max_RFIThreeBetRanges.RANGES
+    private val SIX_MAX_FACING_THREE_BET_RANGES = Nine_Max_FacingThreeBetRanges.RANGES
+
+    // 9max ranges (placeholders - you'll implement these)
+    private val NINE_MAX_RFI_RANGES = Nine_Max_RFI_Ranges.RANGES
+    private val NINE_MAX_CALLING_RANGES = Nine_Max_RFICallingRanges.RANGES
+    private val NINE_MAX_THREE_BET_RANGES = Nine_Max_RFIThreeBetRanges.RANGES
+    private val NINE_MAX_FACING_THREE_BET_RANGES = Nine_Max_FacingThreeBetRanges.RANGES
 
     private fun parsePreviousAction(previousAction: String): List<Pair<String, String>> {
         if (previousAction.isBlank() || previousAction.toLowerCase() == "no action") {
@@ -102,31 +121,51 @@ object PokerLogic {
         return parsedActions
     }
 
-    fun getAdvice(hand: Hand, position: String, previousAction: String?): Triple<String, String, Double> {
+    fun getAdvice(hand: Hand, position: String, previousAction: String?, tableSize: TableSize): Triple<String, String, Double> {
         val handKey = hand.toKey()
         val handStrength = calculateHandStrength(hand, position)
-
         val actions = parsePreviousAction(previousAction ?: "")
         val lastRaise = actions.lastOrNull { it.second == "raises" || it.second == "3-bets" }
 
         val advice: String
         val explanation: String
 
+        // Get the appropriate ranges based on table size
+        val rfiRanges = when(tableSize) {
+            TableSize.SIX_MAX -> SIX_MAX_RFI_RANGES
+            TableSize.NINE_MAX -> NINE_MAX_RFI_RANGES
+        }
+
+        val rfiCallingRanges = when(tableSize) {
+            TableSize.SIX_MAX -> Six_Max_RFICallingRanges.RANGES
+            TableSize.NINE_MAX -> Nine_Max_RFICallingRanges.RANGES
+        }
+
+        val rfiThreeBetRanges = when(tableSize) {
+            TableSize.SIX_MAX -> Six_Max_RFIThreeBetRanges.RANGES
+            TableSize.NINE_MAX -> Nine_Max_RFIThreeBetRanges.RANGES
+        }
+
+        val facingThreeBetRanges = when(tableSize) {
+            TableSize.SIX_MAX -> Nine_Max_FacingThreeBetRanges.RANGES
+            TableSize.NINE_MAX -> Nine_Max_FacingThreeBetRanges.RANGES
+        }
+
         when {
             actions.isEmpty() || previousAction.isNullOrBlank() || previousAction == "No action" || actions.all { it.second == "folds" } -> {
                 // RFI situation
-                if (position in RFI_RANGES && RFI_RANGES[position]?.contains(hand) == true) {
+                if (position in rfiRanges && rfiRanges[position]?.contains(hand) == true) {
                     advice = "Raise"
-                    explanation = "Your hand ($handKey) is strong enough to raise from $position. It’s a good spot to be more aggressive."
+                    explanation = "Your hand ($handKey) is strong enough to raise from $position. It's a good spot to be more aggressive."
                 } else {
                     advice = "Fold"
-                    explanation = "Your hand ($handKey) isn’t ideal for raising from $position. It’s better to fold and wait for a stronger spot."
+                    explanation = "Your hand ($handKey) isn't ideal for raising from $position. It's better to fold and wait for a stronger spot."
                 }
             }
             lastRaise?.second == "3-bets" -> {
                 val threeBetPosition = lastRaise.first
-                if (position in FacingThreeBetRanges.RANGES && threeBetPosition in FacingThreeBetRanges.RANGES[position].orEmpty()) {
-                    val facingThreeBetRange = FacingThreeBetRanges.RANGES[position]!![threeBetPosition]!!
+                if (position in facingThreeBetRanges && threeBetPosition in facingThreeBetRanges[position].orEmpty()) {
+                    val facingThreeBetRange = facingThreeBetRanges[position]!![threeBetPosition]!!
                     when {
                         facingThreeBetRange.fourBetValueRange.contains(hand) -> {
                             advice = "4-Bet for Value"
@@ -157,8 +196,8 @@ object PokerLogic {
             }
             lastRaise?.second == "raises" -> {
                 val raiserPosition = lastRaise.first
-                if (position in RFIThreeBetRanges.RANGES && raiserPosition in RFIThreeBetRanges.RANGES[position].orEmpty()) {
-                    val threeBetRange = RFIThreeBetRanges.RANGES[position]!![raiserPosition]!!
+                if (position in rfiThreeBetRanges && raiserPosition in rfiThreeBetRanges[position].orEmpty()) {
+                    val threeBetRange = rfiThreeBetRanges[position]!![raiserPosition]!!
                     when {
                         threeBetRange.valueRange.contains(hand) -> {
                             advice = "3-Bet for Value"
@@ -170,7 +209,7 @@ object PokerLogic {
                             explanation = "This hand ($handKey) is in the 3-bet bluffing range against a raise from $raiserPosition when you're in $position. " +
                                     "3-bet bluffs add pressure on your opponent and also balance your own 3-betting range, but they should only be used a small percentage of the time."
                         }
-                        RFICallingRanges.RANGES[position]?.get(raiserPosition)?.contains(hand) == true -> {
+                        rfiCallingRanges[position]?.get(raiserPosition)?.contains(hand) == true -> {
                             advice = "Call"
                             explanation = "This hand ($handKey) is in the calling range against a raise from $raiserPosition when you're in $position."
                         }

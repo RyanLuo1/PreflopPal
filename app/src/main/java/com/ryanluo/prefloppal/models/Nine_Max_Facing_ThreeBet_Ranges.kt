@@ -2,7 +2,7 @@ package com.ryanluo.prefloppal.models
 
 import com.ryanluo.prefloppal.utils.Range
 
-object Six_Max_FacingThreeBetRanges {
+object Nine_Max_FacingThreeBetRanges {
     data class FacingThreeBetRange(
         val callRange: Range,
         val fourBetValueRange: Range,
@@ -72,7 +72,7 @@ object Six_Max_FacingThreeBetRanges {
             ),
             "BTN" to FacingThreeBetRange(
                 callRange = Range(setOf("99", "88", "77", "66", "55", "44", "AQs", "AJs", "ATs", "A9s", "A5s", "KQs", "KJs", "KTs",
-                  "K9s", "QJs", "QTs", "Q9s", "JTs", "J9s", "T9s", "T8s", "98s", "87s", "76s", "65s", "AQo", "AJo", "KQo")),
+                    "K9s", "QJs", "QTs", "Q9s", "JTs", "J9s", "T9s", "T8s", "98s", "87s", "76s", "65s", "AQo", "AJo", "KQo")),
                 fourBetValueRange = Range(setOf("AA", "KK", "QQ", "JJ", "TT", "AKs", "AKo")),
                 fourBetBluffRange = Range(setOf("A8s", "A7s", "A6s", "A4s", "A3s", "A2s", "ATo", "KJo", "97s", "86s", "54s"))
             ),
