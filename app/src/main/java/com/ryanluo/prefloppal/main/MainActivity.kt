@@ -187,8 +187,7 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 val suggestions = arrayOf(
                     "UTG folds",
-                    "UTG raises to 2.5 BB",
-                    "UTG all in"
+                    "UTG raises to 2.5 BB"
                 )
                 val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestions)
                 previousActionInput.setAdapter(adapter)
@@ -203,56 +202,68 @@ class MainActivity : AppCompatActivity() {
         getAdviceButton = findViewById(R.id.getAdviceButton)
 
         getAdviceButton.setOnClickListener {
-            val card1 = card1TextView.text.toString()
-            val card2 = card2TextView.text.toString()
-            val tableSizeText = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown).text.toString()
-            val position = positionDropdown.text.toString()
-            val previousAction = previousActionInput.text.toString()
+            try {
+                val card1 = card1TextView.text.toString()
+                val card2 = card2TextView.text.toString()
+                val tableSizeText = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown).text.toString()
+                val position = positionDropdown.text.toString()
+                val previousAction = previousActionInput.text.toString()
 
-            // Convert table size text to enum
-            val tableSize = when(tableSizeText) {
-                "6 Players" -> TableSize.SIX_MAX
-                "9 Players" -> TableSize.NINE_MAX
-                else -> TableSize.SIX_MAX // Default to 6 max if something goes wrong
-            }
-
-            if (position == "BB" && previousAction.isEmpty()) {
-                Toast.makeText(this, "BB can't be RFI, please input previous action", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position" && position != "") {
-                val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction, tableSize)
-
-                // Create and save the hand record
-                val handRecord = HandRecord(
-                    card1 = card1,
-                    card2 = card2,
-                    tableSize = tableSizeText,
-                    position = position,
-                    previousAction = previousAction,
-                    advice = advice,
-                    timestamp = System.currentTimeMillis()
-                )
-
-                // Save to Firebase
-                firebaseManager.saveHandRecord(handRecord) { success ->
-                    if (!success) {
-                        runOnUiThread {
-                            Toast.makeText(this, "Failed to save hand record", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                // Convert table size text to enum
+                val tableSize = when(tableSizeText) {
+                    "6 Players" -> TableSize.SIX_MAX
+                    "9 Players" -> TableSize.NINE_MAX
+                    else -> TableSize.SIX_MAX // Default to 6 max if something goes wrong
                 }
 
-                // Show advice popup
-                showAdvicePopup(advice, explanation, handStrength)
-            } else {
-                val missingItems = mutableListOf<String>()
-                if (card1.isEmpty() || card2.isEmpty()) missingItems.add("cards")
-                if (position == "Select Position" || position == "") missingItems.add("position")
+                if (position == "BB" && previousAction.isEmpty()) {
+                    Toast.makeText(this, "BB can't be RFI, please input previous action", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
 
-                val missingItemsText = missingItems.joinToString(", ")
-                Toast.makeText(this, "Please select $missingItemsText before getting advice", Toast.LENGTH_LONG).show()
+                if (card1.isNotEmpty() && card2.isNotEmpty() && position != "Select Position" && position != "") {
+                    try {
+                        val (advice, explanation, handStrength) = getAdviceAndStrength(card1, card2, position, previousAction, tableSize)
+
+                        // Create and save the hand record
+                        val handRecord = HandRecord(
+                            card1 = card1,
+                            card2 = card2,
+                            tableSize = tableSizeText,
+                            position = position,
+                            previousAction = previousAction,
+                            advice = advice,
+                            timestamp = System.currentTimeMillis()
+                        )
+
+                        // Save to Firebase
+                        firebaseManager.saveHandRecord(handRecord) { success ->
+                            if (!success) {
+                                runOnUiThread {
+                                    Toast.makeText(this, "Failed to save hand record", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+
+                        // Show advice popup
+                        showAdvicePopup(advice, explanation, handStrength)
+
+                    } catch (e: IllegalStateException) {
+                        // Handle 4-bet situations
+                        Toast.makeText(this, "Sorry! PreFlop Pal does not handle actions beyond 3-bets yet.", Toast.LENGTH_LONG).show()
+                        return@setOnClickListener
+                    }
+                } else {
+                    val missingItems = mutableListOf<String>()
+                    if (card1.isEmpty() || card2.isEmpty()) missingItems.add("cards")
+                    if (position == "Select Position" || position == "") missingItems.add("position")
+
+                    val missingItemsText = missingItems.joinToString(", ")
+                    Toast.makeText(this, "Please select $missingItemsText before getting advice", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                // Catch any other unexpected errors
+                Toast.makeText(this, "An error occurred: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

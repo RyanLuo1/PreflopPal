@@ -64,24 +64,72 @@ object PokerLogic {
     private val NINE_MAX_THREE_BET_RANGES = Nine_Max_RFIThreeBetRanges.RANGES
     private val NINE_MAX_FACING_THREE_BET_RANGES = Nine_Max_FacingThreeBetRanges.RANGES
 
-    private fun parsePreviousAction(previousAction: String): List<Pair<String, String>> {
+    private fun parsePreviousAction(previousAction: String, tableSize: TableSize): List<Pair<String, String>> {
         if (previousAction.isBlank() || previousAction.toLowerCase() == "no action") {
             return emptyList()
         }
 
-        val actions = previousAction.split(Regex("[,.]")).map { it.trim().toLowerCase() }
-        val positionMap = mapOf(
-            "utg" to "UTG", "utg+1" to "UTG", "utg+2" to "UTG",
-            "mp" to "MP", "mp+1" to "MP", "hj" to "MP",
-            "co" to "CO", "cutoff" to "CO",
-            "btn" to "BTN", "button" to "BTN",
-            "sb" to "SB", "small blind" to "SB",
-            "bb" to "BB", "big blind" to "BB"
-        )
+        // Split on multiple delimiters including "then", commas, and periods
+        val actions = previousAction
+            .replace(" then ", ",")  // Replace "then" with comma
+            .replace(" and ", ",")   // Replace "and" with comma
+            .replace(";", ",")       // Replace semicolon with comma
+            .split(Regex("[,.]"))
+            .map { it.trim().toLowerCase() }
+
+        val positionMap = when (tableSize) {
+            TableSize.NINE_MAX -> mapOf(
+                "utg" to "UTG",
+                "utg+1" to "UTG+1",
+                "utg+2" to "UTG+2",
+                "lj" to "LJ",
+                "hj" to "HJ",
+                "co" to "CO", "cutoff" to "CO",
+                "btn" to "BTN", "button" to "BTN",
+                "sb" to "SB", "small blind" to "SB",
+                "bb" to "BB", "big blind" to "BB"
+            )
+            TableSize.SIX_MAX -> mapOf(
+                "utg" to "UTG", "utg+1" to "UTG", "utg+2" to "UTG",
+                "mp" to "MP", "mp+1" to "MP", "hj" to "MP",
+                "co" to "CO", "cutoff" to "CO",
+                "btn" to "BTN", "button" to "BTN",
+                "sb" to "SB", "small blind" to "SB",
+                "bb" to "BB", "big blind" to "BB"
+            )
+        }
+
         val actionKeywords = mapOf(
-            "folds" to "folds", "fold" to "folds", "folded" to "folds",
-            "raises" to "raises", "raise" to "raises", "raised" to "raises", "opens" to "raises", "open" to "raises",
-            "3 bets" to "3-bets", "3bet" to "3-bets", "3-bet" to "3-bets", "3 bet" to "3-bets", "3!" to "3-bets"
+            // Fold variations
+            "folds" to "folds",
+            "fold" to "folds",
+            "folded" to "folds",
+            "mucks" to "folds",
+            "passes" to "folds",
+
+            // Raise variations
+            "raises" to "raises",
+            "raise" to "raises",
+            "raised" to "raises",
+            "opens" to "raises",
+            "open" to "raises",
+            "bets" to "raises",
+            "bet" to "raises",
+            "rfi" to "raises",
+
+            // 3-bet variations with shorthand
+            "3 bets" to "3-bets",
+            "3bet" to "3-bets",
+            "3-bet" to "3-bets",
+            "3 bet" to "3-bets",
+            "3!" to "3-bets",
+            "3b" to "3-bets",
+            "3!" to "3-bets",
+            "3betting" to "3-bets",
+            "3-betting" to "3-bets",
+            "reraised" to "3-bets",
+            "reraise" to "3-bets",
+            "reraises" to "3-bets"
         )
 
         val parsedActions = mutableListOf<Pair<String, String>>()
@@ -92,18 +140,36 @@ object PokerLogic {
             var position: String? = null
             var actionType: String? = null
 
-            for (word in words) {
-                if (position == null) {
-                    position = positionMap[word.toLowerCase()]
-                }
-                if (actionType == null) {
-                    actionType = actionKeywords[word.toLowerCase()]
-                    if (actionType == null && word.toLowerCase().contains("bet")) {
-                        actionType = "3-bets"
+            // First try to match exact shorthand like "3!"
+            if (words.size == 1 && actionKeywords.containsKey(words[0].toLowerCase())) {
+                actionType = actionKeywords[words[0].toLowerCase()]
+            }
+
+            // If no match found, try individual words
+            if (actionType == null) {
+                for (word in words) {
+                    if (position == null) {
+                        position = positionMap[word.toLowerCase()]
                     }
-                }
-                if (position != null && actionType != null) {
-                    break
+                    if (actionType == null) {
+                        actionType = actionKeywords[word.toLowerCase()]
+                        // Handle special case for "3!" and other shorthand
+                        if (actionType == null && (word == "3!" || word == "3b")) {
+                            actionType = "3-bets"
+                        }
+                        // Handle 4-bet variations
+                        if (word.startsWith("4") || word == "4!" || word == "4b" || word == "4bet") {
+                            raiseCount = 3  // Force raise count to trigger the error
+                            actionType = "raises"
+                        }
+                        // Handle any word containing "bet"
+                        if (actionType == null && word.toLowerCase().contains("bet")) {
+                            actionType = "3-bets"
+                        }
+                    }
+                    if (position != null && actionType != null) {
+                        break
+                    }
                 }
             }
 
@@ -114,6 +180,15 @@ object PokerLogic {
                         actionType = "3-bets"
                     }
                 }
+                if (actionType == "3-bets") {
+                    raiseCount++
+                }
+
+                // Check for 4-bet situation
+                if (raiseCount > 2) {
+                    throw IllegalStateException("PreFlopPal currently doesn't handle actions beyond 3-bets. (e.g., 4-bets or higher)")
+                }
+
                 parsedActions.add(Pair(position, actionType))
             }
         }
@@ -124,7 +199,7 @@ object PokerLogic {
     fun getAdvice(hand: Hand, position: String, previousAction: String?, tableSize: TableSize): Triple<String, String, Double> {
         val handKey = hand.toKey()
         val handStrength = calculateHandStrength(hand, position)
-        val actions = parsePreviousAction(previousAction ?: "")
+        val actions = parsePreviousAction(previousAction ?: "",tableSize)
         val lastRaise = actions.lastOrNull { it.second == "raises" || it.second == "3-bets" }
 
         val advice: String
