@@ -7,6 +7,9 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
@@ -71,9 +74,9 @@ class HistoryActivity : AppCompatActivity() {
         }
 
         dialog.findViewById<TextView>(R.id.handTextView).text = "${record.card1} ${record.card2}"
-        dialog.findViewById<TextView>(R.id.positionTextView).text = "Position: ${record.position}"
-        dialog.findViewById<TextView>(R.id.previousActionTextView).text = "Previous Action: ${record.previousAction}"
-        dialog.findViewById<TextView>(R.id.adviceTextView).text = "Advice: ${record.advice}"
+        dialog.findViewById<TextView>(R.id.positionTextView).text = buildBoldText("Position: ", record.position)
+        dialog.findViewById<TextView>(R.id.previousActionTextView).text = buildBoldText("Previous Action: ", record.previousAction)
+        dialog.findViewById<TextView>(R.id.adviceTextView).text = buildBoldText("Advice: ", record.advice)
         dialog.findViewById<TextView>(R.id.timestampTextView).text = SimpleDateFormat(
             "MMM dd, yyyy HH:mm:ss",
             Locale.getDefault()
@@ -82,6 +85,19 @@ class HistoryActivity : AppCompatActivity() {
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
     }
+
+    // Helper function to create bold text for label
+    private fun buildBoldText(label: String, value: String): SpannableString {
+        val spannable = SpannableString("$label$value")
+        spannable.setSpan(
+            StyleSpan(Typeface.BOLD), // Bold style
+            0,
+            label.length, // Apply only to the label part
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return spannable
+    }
+
 
     private fun setupSwipeToDelete() {
         val swipeHandler = object : ItemTouchHelper.SimpleCallback(
@@ -108,7 +124,7 @@ class HistoryActivity : AppCompatActivity() {
                     gravity = Gravity.CENTER
                 }
 
-                AlertDialog.Builder(this@HistoryActivity)
+                val alertDialog = AlertDialog.Builder(this@HistoryActivity)
                     .setCustomTitle(title)
                     .setMessage("Are you sure you want to delete this hand history?")
                     .setPositiveButton("Delete") { _, _ ->
@@ -138,7 +154,13 @@ class HistoryActivity : AppCompatActivity() {
                     .setOnCancelListener {
                         adapter.notifyItemChanged(position)
                     }
-                    .show()
+                    .create()
+
+                // Apply the custom rounded background to the dialog window
+                alertDialog.window?.setBackgroundDrawableResource(R.drawable.card_background)
+
+                // Show the dialog
+                alertDialog.show()
             }
 
             override fun onChildDraw(
@@ -187,6 +209,7 @@ class HistoryActivity : AppCompatActivity() {
 
         ItemTouchHelper(swipeHandler).attachToRecyclerView(recyclerView)
     }
+
 
     private fun setupBottomNavigation() {
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
