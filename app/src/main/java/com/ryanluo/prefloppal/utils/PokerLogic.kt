@@ -154,7 +154,7 @@ object PokerLogic {
             "bet" to "raises",
             "rfi" to "raises",
 
-            // 3-bet variations with shorthand
+            // 3-bet variations
             "3 bets" to "3-bets",
             "3bet" to "3-bets",
             "3-bet" to "3-bets",
@@ -168,6 +168,7 @@ object PokerLogic {
             "reraise" to "3-bets",
             "reraises" to "3-bets",
 
+            // 4-bet variations
             "4 bets" to "4-bets",
             "4bet" to "4-bets",
             "4-bet" to "4-bets",
@@ -383,7 +384,7 @@ object PokerLogic {
             val rank2 = rankOrder.indexOf(hand.card2.rank)
             val gap = abs(rank1 - rank2)
             return when {
-                gap == 1 -> 0.4  // Connector
+                gap == 1 -> 0.3  // Connector
                 gap == 2 -> 0.2  // One-gapper
                 gap == 3 -> 0.1  // Two-gapper
                 else -> 0.0
