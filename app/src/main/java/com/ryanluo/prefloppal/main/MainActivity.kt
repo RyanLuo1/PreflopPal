@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -47,9 +46,11 @@ class MainActivity : AppCompatActivity() {
         setupToolbar()
         setupCardSelection()
         setupTableSizeDropdown()
+        setupTableSizeInfo()
         setupPositionDropdown()
         setupPositionInfo()
         setupPreviousActionInput()
+        setupPreviousActionInfo()
         setupGetAdviceButton()
         setupBottomNavigation()
     }
@@ -98,6 +99,31 @@ class MainActivity : AppCompatActivity() {
             setupPositionDropdown()
             // Clear current position selection when table size changes
             positionDropdown.setText("", false)
+        }
+    }
+
+    private fun setupTableSizeInfo() {
+        val infoIcon = findViewById<ImageView>(R.id.tableSizeInfoIcon)
+        infoIcon.setOnClickListener {
+            val dialog = Dialog(this)
+            dialog.setContentView(R.layout.dialog_table_size_info)
+
+            // Round the corners of the dialog window
+            dialog.window?.apply {
+                setBackgroundDrawableResource(R.drawable.card_background)
+                // Set the dialog width to 90% of screen width
+                val displayMetrics = resources.displayMetrics
+                val width = (displayMetrics.widthPixels * 0.9).toInt()
+                setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
+            }
+
+            // Add a button at the bottom
+            val button = dialog.findViewById<MaterialButton>(R.id.gotItButton)
+            button?.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
         }
     }
 
@@ -195,6 +221,31 @@ class MainActivity : AppCompatActivity() {
                 previousActionInput.setText("") // Clear any existing text
                 previousActionInput.isEnabled = true
             }
+        }
+    }
+
+    private fun setupPreviousActionInfo() {
+        val infoIcon = findViewById<ImageView>(R.id.previousActionInfoIcon)
+        infoIcon.setOnClickListener {
+            val dialog = Dialog(this)
+            dialog.setContentView(R.layout.dialog_previous_action_info)
+
+            // Round the corners of the dialog window
+            dialog.window?.apply {
+                setBackgroundDrawableResource(R.drawable.card_background)
+                // Set the dialog width to 90% of screen width
+                val displayMetrics = resources.displayMetrics
+                val width = (displayMetrics.widthPixels * 0.9).toInt()
+                setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
+            }
+
+            // Add a button at the bottom
+            val button = dialog.findViewById<MaterialButton>(R.id.gotItButton)
+            button?.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
         }
     }
 

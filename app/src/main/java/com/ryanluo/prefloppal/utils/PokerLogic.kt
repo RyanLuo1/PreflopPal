@@ -64,6 +64,7 @@ object PokerLogic {
     private val NINE_MAX_THREE_BET_RANGES = Nine_Max_RFIThreeBetRanges.RANGES
     private val NINE_MAX_FACING_THREE_BET_RANGES = Nine_Max_FacingThreeBetRanges.RANGES
 
+
     private fun parsePreviousAction(previousAction: String, tableSize: TableSize): List<Pair<String, String>> {
         if (previousAction.isBlank() || previousAction.toLowerCase() == "no action") {
             return emptyList()
@@ -77,25 +78,61 @@ object PokerLogic {
             .split(Regex("[,.]"))
             .map { it.trim().toLowerCase() }
 
+        val positionPhrases = listOf(
+            "under the gun" to "UTG",
+            "utg plus one" to "UTG+1",
+            "utg plus two" to "UTG+2",
+            "middle position" to "MP",
+            "low jack" to "LJ",
+            "high jack" to "HJ",
+            "cut off" to "CO",
+            "small blind" to "SB",
+            "big blind" to "BB"
+        )
+
         val positionMap = when (tableSize) {
             TableSize.NINE_MAX -> mapOf(
                 "utg" to "UTG",
+                "underthegun" to "UTG",
                 "utg+1" to "UTG+1",
+                "utgplusone" to "UTG+1",
                 "utg+2" to "UTG+2",
+                "utgplustwo" to "UTG+2",
+                "mp" to "LJ",
                 "lj" to "LJ",
+                "lowjack" to "LJ",
                 "hj" to "HJ",
-                "co" to "CO", "cutoff" to "CO",
-                "btn" to "BTN", "button" to "BTN",
-                "sb" to "SB", "small blind" to "SB",
-                "bb" to "BB", "big blind" to "BB"
+                "highjack" to "HJ",
+                "co" to "CO",
+                "cutoff" to "CO",
+                "btn" to "BTN",
+                "button" to "BTN",
+                "sb" to "SB",
+                "smallblind" to "SB",
+                "bb" to "BB",
+                "bigblind" to "BB"
             )
             TableSize.SIX_MAX -> mapOf(
-                "utg" to "UTG", "utg+1" to "UTG", "utg+2" to "UTG",
-                "mp" to "MP", "mp+1" to "MP", "hj" to "MP",
-                "co" to "CO", "cutoff" to "CO",
-                "btn" to "BTN", "button" to "BTN",
-                "sb" to "SB", "small blind" to "SB",
-                "bb" to "BB", "big blind" to "BB"
+                "utg" to "UTG",
+                "underthegun" to "UTG",
+                "utg+1" to "UTG",
+                "utgplusone" to "UTG",
+                "utg+2" to "UTG",
+                "utgplustwo" to "UTG",
+                "mp" to "MP",
+                "middleposition" to "MP",
+                "lj" to "MP",
+                "lowjack" to "MP",
+                "hj" to "MP",
+                "highjack" to "MP",
+                "co" to "CO",
+                "cutoff" to "CO",
+                "btn" to "BTN",
+                "button" to "BTN",
+                "sb" to "SB",
+                "smallblind" to "SB",
+                "bb" to "BB",
+                "bigblind" to "BB"
             )
         }
 
@@ -129,7 +166,16 @@ object PokerLogic {
             "3-betting" to "3-bets",
             "reraised" to "3-bets",
             "reraise" to "3-bets",
-            "reraises" to "3-bets"
+            "reraises" to "3-bets",
+
+            "4 bets" to "4-bets",
+            "4bet" to "4-bets",
+            "4-bet" to "4-bets",
+            "4 bet" to "4-bets",
+            "4!" to "4-bets",
+            "4b" to "4-bets",
+            "4betting" to "4-bets",
+            "4-betting" to "4-bets",
         )
 
         val parsedActions = mutableListOf<Pair<String, String>>()
@@ -140,36 +186,31 @@ object PokerLogic {
             var position: String? = null
             var actionType: String? = null
 
-            // First try to match exact shorthand like "3!"
-            if (words.size == 1 && actionKeywords.containsKey(words[0].toLowerCase())) {
-                actionType = actionKeywords[words[0].toLowerCase()]
+            // Try to match position first
+            val fullText = words.joinToString(" ").toLowerCase()
+
+            // First try matching full phrases
+            for ((phrase, pos) in positionPhrases) {
+                if (fullText.contains(phrase)) {
+                    position = pos
+                    break
+                }
             }
 
-            // If no match found, try individual words
-            if (actionType == null) {
-                for (word in words) {
-                    if (position == null) {
-                        position = positionMap[word.toLowerCase()]
-                    }
-                    if (actionType == null) {
-                        actionType = actionKeywords[word.toLowerCase()]
-                        // Handle special case for "3!" and other shorthand
-                        if (actionType == null && (word == "3!" || word == "3b")) {
-                            actionType = "3-bets"
-                        }
-                        // Handle 4-bet variations
-                        if (word.startsWith("4") || word == "4!" || word == "4b" || word == "4bet") {
-                            raiseCount = 3  // Force raise count to trigger the error
-                            actionType = "raises"
-                        }
-                        // Handle any word containing "bet"
-                        if (actionType == null && word.toLowerCase().contains("bet")) {
-                            actionType = "3-bets"
-                        }
-                    }
-                    if (position != null && actionType != null) {
-                        break
-                    }
+            // If no phrase match, try single word matches
+            if (position == null) {
+                val joinedWords = words.joinToString("").toLowerCase()
+                position = positionMap[joinedWords] ?: positionMap[fullText] ?: words
+                    .asSequence()
+                    .map { it.toLowerCase().replace(" ", "") }
+                    .firstNotNullOfOrNull { positionMap[it] }
+            }
+
+            // Look for action type
+            for (word in words) {
+                val lowercaseWord = word.toLowerCase()
+                if (actionType == null) {
+                    actionType = actionKeywords[lowercaseWord]
                 }
             }
 
@@ -180,13 +221,12 @@ object PokerLogic {
                         actionType = "3-bets"
                     }
                 }
-                if (actionType == "3-bets") {
+                if (actionType == "3-bets" ||actionType == "4-bets") {
                     raiseCount++
                 }
 
-                // Check for 4-bet situation
                 if (raiseCount > 2) {
-                    throw IllegalStateException("PreFlopPal currently doesn't handle actions beyond 3-bets. (e.g., 4-bets or higher)")
+                    throw IllegalStateException("PreFlopPal currently doesn't handle actions beyond 3-bets.")
                 }
 
                 parsedActions.add(Pair(position, actionType))

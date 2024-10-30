@@ -103,7 +103,6 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-
     <androidx.cardview.widget.CardView
         android:id="@+id/tableSizeContainer"
         android:layout_width="match_parent"
@@ -116,24 +115,37 @@
         app:layout_constraintTop_toBottomOf="@id/cardSelectionContainer"
         app:layout_constraintBottom_toTopOf="@id/positionContainer">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Table Size"
-                android:textColor="@color/dark_purple"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp"
-                android:fontFamily="@font/roboto_regular"/>
+                android:layout_marginBottom="16dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="Table Size"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_regular"/>
+
+                <ImageView
+                    android:id="@+id/tableSizeInfoIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_info"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:tint="@color/dark_purple" />
+
+            </RelativeLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tableSizeDropdownLayout"
@@ -143,7 +155,6 @@
                 app:boxStrokeColor="@color/primary_purple"
                 app:hintTextColor="@color/medium_purple">
 
-
                 <AutoCompleteTextView
                     android:id="@+id/tableSizeDropdown"
                     android:layout_width="match_parent"
@@ -151,7 +162,6 @@
                     android:inputType="none"
                     android:hint="Select Table Size"
                     android:textColor="@color/dark_purple" />
-
 
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -244,24 +254,37 @@
         app:cardElevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/positionContainer">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Previous Action"
-                android:textColor="@color/dark_purple"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp"
-                android:fontFamily="@font/roboto_regular"/>
+                android:layout_marginBottom="16dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="Previous Action"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_regular"/>
+
+                <ImageView
+                    android:id="@+id/previousActionInfoIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_info"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:tint="@color/dark_purple" />
+
+            </RelativeLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/previousActionLayout"
@@ -271,7 +294,6 @@
                 app:boxStrokeColor="@color/primary_purple"
                 app:hintTextColor="@color/medium_purple">
 
-
                 <AutoCompleteTextView
                     android:id="@+id/previousActionInput"
                     android:layout_width="match_parent"
@@ -279,7 +301,6 @@
                     android:hint="Enter previous action"
                     android:inputType="text"
                     android:textColor="@color/dark_purple" />
-
 
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
