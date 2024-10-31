@@ -4,7 +4,8 @@ import com.ryanluo.prefloppal.models.Nine_Max_RFICallingRanges
 import com.ryanluo.prefloppal.models.Nine_Max_FacingThreeBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_RFIThreeBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_RFI_Ranges
-import com.ryanluo.prefloppal.models.RFIThreeBetRange
+
+import com.ryanluo.prefloppal.models.Six_Max_FacingThreeBetRanges
 import com.ryanluo.prefloppal.models.Six_Max_RFICallingRanges
 import com.ryanluo.prefloppal.models.Six_Max_RFIThreeBetRanges
 import com.ryanluo.prefloppal.models.Six_Max_RFI_Ranges
@@ -263,7 +264,7 @@ object PokerLogic {
         }
 
         val facingThreeBetRanges = when(tableSize) {
-            TableSize.SIX_MAX -> Nine_Max_FacingThreeBetRanges.RANGES
+            TableSize.SIX_MAX -> Six_Max_FacingThreeBetRanges.RANGES
             TableSize.NINE_MAX -> Nine_Max_FacingThreeBetRanges.RANGES
         }
 

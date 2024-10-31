@@ -128,7 +128,11 @@ class LearnActivity : AppCompatActivity() {
                         finish()
                         true
                     }
-                    R.id.navigation_learn -> true // Already here
+                    R.id.navigation_learn -> {
+                        startActivity(Intent(this@LearnActivity, LearnActivity::class.java))
+                        finish()
+                        true
+                    } // Already here
                     R.id.navigation_history -> {
                         startActivity(Intent(this@LearnActivity, HistoryActivity::class.java))
                         finish()

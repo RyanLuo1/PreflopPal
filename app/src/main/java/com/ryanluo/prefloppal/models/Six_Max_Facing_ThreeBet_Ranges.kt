@@ -3,11 +3,6 @@ package com.ryanluo.prefloppal.models
 import com.ryanluo.prefloppal.utils.Range
 
 object Six_Max_FacingThreeBetRanges {
-    data class FacingThreeBetRange(
-        val callRange: Range,
-        val fourBetValueRange: Range,
-        val fourBetBluffRange: Range
-    )
 
     val RANGES = mapOf(
 
