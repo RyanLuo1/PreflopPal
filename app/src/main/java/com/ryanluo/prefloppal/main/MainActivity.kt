@@ -344,12 +344,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_learn -> {
                     // Handle learn navigation
+                    startActivity(Intent(this, LearnActivity::class.java))
                     true
                 }
                 R.id.navigation_history -> {
                     // Handle history navigation
                     startActivity(Intent(this, HistoryActivity::class.java))
-                    //overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                     true
                 }
                 else -> false

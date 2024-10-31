@@ -35,6 +35,11 @@
             android:name=".main.MainActivity"
             android:exported="false"/>
 
+        <!-- Learn Activity -->
+        <activity
+            android:name=".main.LearnActivity"
+            android:exported="false"/>
+
         <!-- History Activity -->
         <activity
             android:name=".main.HistoryActivity"

@@ -228,7 +228,8 @@ class HistoryActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_learn -> {
-                    Toast.makeText(this, "Learn feature coming soon!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, LearnActivity::class.java))
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
                     true
                 }
                 R.id.navigation_history -> {

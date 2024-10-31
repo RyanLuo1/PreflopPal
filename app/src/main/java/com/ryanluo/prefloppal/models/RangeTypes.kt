@@ -6,3 +6,9 @@ data class RFIThreeBetRange(
     val valueRange: Range,
     val bluffRange: Range
 )
+
+data class FacingThreeBetRange(
+    val callRange: Range,
+    val fourBetValueRange: Range,
+    val fourBetBluffRange: Range
+)
