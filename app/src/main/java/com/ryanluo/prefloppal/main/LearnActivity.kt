@@ -24,7 +24,7 @@ class LearnActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_learn)
+        setContentView(R.layout.learn_activity)
 
         setupMenuIcon()
         setupBottomNavigation()

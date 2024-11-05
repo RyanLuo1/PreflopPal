@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_table_size"
+        android:title="Table Size"
+        app:showAsAction="never">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/table_size_6"
+                    android:title="6 Players"
+                    android:checkable="true" />
+                <item
+                    android:id="@+id/table_size_9"
+                    android:title="9 Players"
+                    android:checkable="true" />
+            </group>
+        </menu>
+    </item>
+</menu>

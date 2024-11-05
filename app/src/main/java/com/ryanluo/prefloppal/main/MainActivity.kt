@@ -7,12 +7,16 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.ImageView
 import android.widget.ListPopupWindow
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +41,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var getAdviceButton: MaterialButton
     private lateinit var firebaseManager: FirebaseManager
 
+    private var currentTableSize = "9 Players"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
@@ -45,8 +51,8 @@ class MainActivity : AppCompatActivity() {
 
         setupToolbar()
         setupCardSelection()
-        setupTableSizeDropdown()
-        setupTableSizeInfo()
+        //setupTableSizeDropdown()
+        //setupTableSizeInfo()
         setupPositionDropdown()
         setupPositionInfo()
         setupPreviousActionInput()
@@ -59,8 +65,55 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        //findViewById<TextView>(R.id.toolbarTitle).text = "PreFlop Pal"
+
+        // Setup menu icon
+        findViewById<ImageView>(R.id.menuIcon).setOnClickListener { view ->
+            showPopupMenu(view)
+        }
     }
+
+    private fun showPopupMenu(view: View) {
+        PopupMenu(this, view).apply {
+            menuInflater.inflate(R.menu.home_menu, menu)
+
+            // Set current check state
+            when (currentTableSize) {
+                "6 Players" -> {
+                    menu.findItem(R.id.table_size_6).isChecked = true
+                    menu.findItem(R.id.table_size_9).isChecked = false
+                }
+                "9 Players" -> {
+                    menu.findItem(R.id.table_size_9).isChecked = true
+                    menu.findItem(R.id.table_size_6).isChecked = false
+                }
+            }
+
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.table_size_6 -> {
+                        updateTableSize("6 Players")
+                        menu.findItem(R.id.table_size_6).isChecked = true
+                        menu.findItem(R.id.table_size_9).isChecked = false
+                        true
+                    }
+                    R.id.table_size_9 -> {
+                        updateTableSize("9 Players")
+                        menu.findItem(R.id.table_size_9).isChecked = true
+                        menu.findItem(R.id.table_size_6).isChecked = false
+                        true
+                    }
+                    else -> false
+                }
+            }
+            show()
+        }
+    }
+    private fun updateTableSize(size: String) {
+        currentTableSize = size
+        setupPositionDropdown()
+        positionDropdown.setText("", false)
+    }
+
 
     private fun setupCardSelection() {
         card1TextView = findViewById(R.id.card1)
@@ -85,53 +138,9 @@ class MainActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, "CardSelectionDialog")
     }
 
-    private fun setupTableSizeDropdown() {
-        val tableSizes = listOf("6 Players", "9 Players")
-        val adapter = ArrayAdapter(this, R.layout.position_dropdown, tableSizes)
-        val tableSizeDropdown = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown)
-        tableSizeDropdown.setAdapter(adapter)
-
-        // Set default value
-        tableSizeDropdown.setText("6 Players", false)
-
-        tableSizeDropdown.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            // Just trigger position dropdown to update based on new table size
-            setupPositionDropdown()
-            // Clear current position selection when table size changes
-            positionDropdown.setText("", false)
-        }
-    }
-
-    private fun setupTableSizeInfo() {
-        val infoIcon = findViewById<ImageView>(R.id.tableSizeInfoIcon)
-        infoIcon.setOnClickListener {
-            val dialog = Dialog(this)
-            dialog.setContentView(R.layout.dialog_table_size_info)
-
-            // Round the corners of the dialog window
-            dialog.window?.apply {
-                setBackgroundDrawableResource(R.drawable.card_background)
-                // Set the dialog width to 90% of screen width
-                val displayMetrics = resources.displayMetrics
-                val width = (displayMetrics.widthPixels * 0.9).toInt()
-                setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
-            }
-
-            // Add a button at the bottom
-            val button = dialog.findViewById<MaterialButton>(R.id.gotItButton)
-            button?.setOnClickListener {
-                dialog.dismiss()
-            }
-
-            dialog.show()
-        }
-    }
-
-
+    // Modify setupPositionDropdown to use currentTableSize instead of finding the dropdown
     private fun setupPositionDropdown() {
-        val tableSizeText = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown).text.toString()
-
-        val positions = when(tableSizeText) {
+        val positions = when(currentTableSize) {
             "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
             else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
         }
@@ -143,9 +152,7 @@ class MainActivity : AppCompatActivity() {
         popup.apply {
             anchorView = positionDropdown
             setAdapter(adapter)
-
-            //height for scrollable menu
-            height = 500 // Replace with desired max height in pixels
+            height = 500
 
             setOnItemClickListener { _, _, position, _ ->
                 val selectedPosition = positions[position]
@@ -256,12 +263,11 @@ class MainActivity : AppCompatActivity() {
             try {
                 val card1 = card1TextView.text.toString()
                 val card2 = card2TextView.text.toString()
-                val tableSizeText = findViewById<AutoCompleteTextView>(R.id.tableSizeDropdown).text.toString()
                 val position = positionDropdown.text.toString()
                 val previousAction = previousActionInput.text.toString()
 
-                // Convert table size text to enum
-                val tableSize = when(tableSizeText) {
+                // Convert table size from currentTableSize property
+                val tableSize = when(currentTableSize) {
                     "6 Players" -> TableSize.SIX_MAX
                     "9 Players" -> TableSize.NINE_MAX
                     else -> TableSize.SIX_MAX // Default to 6 max if something goes wrong
@@ -280,7 +286,7 @@ class MainActivity : AppCompatActivity() {
                         val handRecord = HandRecord(
                             card1 = card1,
                             card2 = card2,
-                            tableSize = tableSizeText,
+                            tableSize = currentTableSize,  // Use currentTableSize here
                             position = position,
                             previousAction = previousAction,
                             advice = advice,
