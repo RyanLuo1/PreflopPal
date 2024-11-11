@@ -263,6 +263,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateTableAfterUserAction(userPosition: String, userAction: String) {
+        println("DEBUG: updateTableAfterUserAction called")
+        println("DEBUG: userPosition = $userPosition")
+        println("DEBUG: userAction = $userAction")
+        println("DEBUG: firstRaisePosition = $firstRaisePosition")
+        println("DEBUG: first3BetPosition = $first3BetPosition")
+
         val allPositions = when(currentTableSize) {
             "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
             else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
@@ -272,8 +278,15 @@ class MainActivity : AppCompatActivity() {
         val positionsToAdd = mutableListOf<String>()
 
         when (userAction) {
+            "raise" -> {
+                println("DEBUG: updateTableAfterUserAction handling raise")
+                val userIndex = allPositions.indexOf(userPosition)
+                if (userIndex != -1) {
+                    positionsToAdd.addAll(allPositions.subList(userIndex + 1, allPositions.size))
+                }
+            }
             "3bet" -> {
-                // After 3bet, show positions after user and original raiser
+                println("DEBUG: updateTableAfterUserAction handling 3bet")
                 val userIndex = allPositions.indexOf(userPosition)
                 if (userIndex != -1) {
                     positionsToAdd.addAll(allPositions.subList(userIndex + 1, allPositions.size))
@@ -283,16 +296,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "4bet" -> {
-                // After 4bet, ONLY show the 3bettor with fold/all-in
+                println("DEBUG: updateTableAfterUserAction handling 4bet")
+                // Add the 3bettor's response
                 first3BetPosition?.let { threeBetPos ->
+                    println("DEBUG: Adding 3bettor position for fold/all-in: $threeBetPos")
                     positionsToAdd.add(threeBetPos)
                 }
+                println("DEBUG: Positions to add after 4bet: $positionsToAdd")
             }
         }
 
         // Add the new positions to the table
         positionsToAdd.forEach { position ->
+            println("DEBUG: Adding position: $position with action: $userAction")
             when (userAction) {
+                "raise" -> {
+                    addPositionRow(position, false)
+                }
                 "3bet" -> {
                     if (position == firstRaisePosition) {
                         addPositionRowWithOptions(position, listOf("fold", "call", "4bet"))
@@ -301,10 +321,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 "4bet" -> {
+                    println("DEBUG: Adding fold/all-in options for position: $position")
                     addPositionRowWithOptions(position, listOf("fold", "all in"))
-                }
-                else -> {
-                    addPositionRow(position, false)
                 }
             }
         }
@@ -444,6 +462,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleActionClick(clickedButton: MaterialButton, position: String, action: String) {
+        println("DEBUG: handleActionClick started")
+        println("DEBUG: position = $position")
+        println("DEBUG: action = $action")
+
         // Get parent layout and all buttons
         val buttonsLayout = clickedButton.parent as LinearLayout
         val buttons = (0 until buttonsLayout.childCount)
@@ -451,6 +473,7 @@ class MainActivity : AppCompatActivity() {
 
         // Store previous action before updating
         val previousAction = positionActions[position]
+        println("DEBUG: previousAction = $previousAction")
 
         // Immediately highlight the clicked button
         buttons.forEach { button ->
@@ -467,18 +490,17 @@ class MainActivity : AppCompatActivity() {
             previousAction == "raise" && (action == "call" || action == "fold") -> true
             else -> false
         }
+        println("DEBUG: isDeEscalation = $isDeEscalation")
 
         // Check all possible escalation scenarios
         val isEscalation = when {
-            // From call to higher action
             previousAction == "call" && (action == "3bet" || action == "4bet") -> true
-            // From fold to any action
             previousAction == "fold" && (action == "raise" || action == "call" || action == "3bet" || action == "4bet") -> true
-            // From lower bet to higher bet
             previousAction == "raise" && (action == "3bet" || action == "4bet") -> true
             previousAction == "3bet" && action == "4bet" -> true
             else -> false
         }
+        println("DEBUG: isEscalation = $isEscalation")
 
         val allPositions = when(currentTableSize) {
             "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
@@ -487,28 +509,34 @@ class MainActivity : AppCompatActivity() {
 
         // Check if this is the user's selected position
         val isUserPosition = position == positionDropdown.text.toString()
+        println("DEBUG: isUserPosition = $isUserPosition")
+        println("DEBUG: firstRaisePosition = $firstRaisePosition")
+        println("DEBUG: first3BetPosition = $first3BetPosition")
+        println("DEBUG: first4BetPosition = $first4BetPosition")
 
-        if ((isUserPosition && (action == "raise" || action == "3bet" || action == "4bet")) ||
-            (position == firstRaisePosition && action == "4bet")) {
-            // Handle user's aggressive action
+        if (isUserPosition && (action == "raise" || action == "3bet" || action == "4bet")) {
+            println("DEBUG: Inside user position aggressive action block")
             when (action) {
                 "raise" -> {
+                    println("DEBUG: Handling user raise")
                     firstRaisePosition = position
                     updateTableAfterUserAction(position, "raise")
                     updateSubsequentActions(position, "raise")
                 }
                 "3bet" -> {
+                    println("DEBUG: Handling user 3bet")
                     first3BetPosition = position
                     updateTableAfterUserAction(position, "3bet")
                     updateSubsequentActions(position, "3bet")
                 }
                 "4bet" -> {
+                    println("DEBUG: Handling user 4bet")
                     first4BetPosition = position
                     updateTableAfterUserAction(position, "4bet")
-                    //updateSubsequentActions(position, "4bet")
                 }
             }
         } else if (isDeEscalation) {
+            println("DEBUG: Inside de-escalation block")
             when {
                 position == first3BetPosition -> {
                     first3BetPosition = null
@@ -533,9 +561,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } else if (isEscalation) {
+            println("DEBUG: Inside escalation block")
             when (action) {
                 "raise" -> {
-                    // If escalating to a raise, reset any higher actions
+                    println("DEBUG: Handling escalation raise")
                     if (first3BetPosition != null &&
                         allPositions.indexOf(first3BetPosition!!) > allPositions.indexOf(position)) {
                         first3BetPosition = null
@@ -546,19 +575,14 @@ class MainActivity : AppCompatActivity() {
                     updateSubsequentActions(position, "raise")
                 }
                 "3bet" -> {
-                    // If escalating to a 3bet, reset any existing 3bets and 4bets that come after
-                    if (first3BetPosition != null &&
-                        allPositions.indexOf(first3BetPosition!!) > allPositions.indexOf(position)) {
-                        first3BetPosition = position
-                        first4BetPosition = null
-                        resetPositionsAfter(position, action)
-                    } else {
-                        first3BetPosition = position
-                    }
+                    println("DEBUG: Handling escalation 3bet")
+                    first3BetPosition = position
+                    println("DEBUG: Set first3BetPosition to: $first3BetPosition")
+                    updateTableAfterUserAction(position, "3bet")
                     updateSubsequentActions(position, "3bet")
                 }
                 "4bet" -> {
-                    // If escalating to a 4bet, reset any existing 4bets that come after
+                    println("DEBUG: Handling escalation 4bet")
                     if (first4BetPosition != null &&
                         allPositions.indexOf(first4BetPosition!!) > allPositions.indexOf(position)) {
                         first4BetPosition = position
@@ -566,11 +590,11 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         first4BetPosition = position
                     }
-                    updateSubsequentActions(position, "4bet")
+                    updateTableAfterUserAction(position, "4bet")
                 }
             }
         } else {
-            // Handle new actions (when there was no previous action)
+            println("DEBUG: Inside default action block")
             when (action) {
                 "raise" -> {
                     firstRaisePosition = position
@@ -582,13 +606,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "4bet" -> {
                     first4BetPosition = position
-                    updateSubsequentActions(position, "4bet")
-                }
-                "call" -> {
-                    // No need to update subsequent actions for calls
-                }
-                "fold" -> {
-                    // No need to update subsequent actions for folds
+                    updateTableAfterUserAction(position, "4bet")
                 }
             }
         }
