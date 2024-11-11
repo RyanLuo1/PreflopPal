@@ -232,6 +232,13 @@ class MainActivity : AppCompatActivity() {
         actionSummaryText.visibility = View.GONE
     }
 
+
+
+
+
+
+
+
     private fun updateActionTableForPosition(selectedPosition: String) {
         // Clear existing table and actions
         actionTable.removeAllViews()
@@ -264,26 +271,24 @@ class MainActivity : AppCompatActivity() {
         // Determine which positions need to show up
         val positionsToAdd = mutableListOf<String>()
 
-        // Add all positions after user's position first
-        val userIndex = allPositions.indexOf(userPosition)
-        if (userIndex != -1) {
-            positionsToAdd.addAll(allPositions.subList(userIndex + 1, allPositions.size))
-        }
-
-        // Add positions that need to act again
         when (userAction) {
             "3bet" -> {
+                // After 3bet, show positions after user and original raiser
+                val userIndex = allPositions.indexOf(userPosition)
+                if (userIndex != -1) {
+                    positionsToAdd.addAll(allPositions.subList(userIndex + 1, allPositions.size))
+                }
                 firstRaisePosition?.let { raisePos ->
                     positionsToAdd.add(raisePos)
                 }
             }
             "4bet" -> {
+                // After 4bet, ONLY show the 3bettor with fold/all-in
                 first3BetPosition?.let { threeBetPos ->
                     positionsToAdd.add(threeBetPos)
                 }
             }
         }
-
 
         // Add the new positions to the table
         positionsToAdd.forEach { position ->
@@ -296,40 +301,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 "4bet" -> {
-                    if (position == first3BetPosition) {
-                        addPositionRowWithOptions(position, listOf("fold", "all in"))
-                    } else {
-                        addPositionRow(position, false)
-                    }
+                    addPositionRowWithOptions(position, listOf("fold", "all in"))
                 }
                 else -> {
                     addPositionRow(position, false)
-                }
-            }
-        }
-
-        // Update the buttons in the original raiser's row to show only fold/raise
-        if (userAction == "3bet" && firstRaisePosition != null) {
-            println("DEBUG: Updating original raiser row")
-            for (i in 0 until actionTable.childCount) {
-                val row = actionTable.getChildAt(i) as? TableRow ?: continue
-                val posText = (row.getChildAt(0) as? TextView)?.text?.toString() ?: continue
-
-                if (posText == firstRaisePosition && !posText.startsWith("UTG (2)")) {
-                    println("DEBUG: Found original raiser row, updating buttons")
-                    val buttonsLayout = row.getChildAt(1) as LinearLayout
-                    buttonsLayout.removeAllViews()
-
-                    // Add only fold and raise buttons
-                    val foldButton = createActionButton("fold", posText, false)
-                    val raiseButton = createActionButton("raise", posText, false)
-
-                    // Highlight the raise button
-                    updateButtonAppearance(raiseButton, true)
-
-                    buttonsLayout.addView(foldButton)
-                    buttonsLayout.addView(raiseButton)
-                    break
                 }
             }
         }
@@ -374,9 +349,6 @@ class MainActivity : AppCompatActivity() {
 
     // Add this helper function
     private fun addPositionRowWithOptions(position: String, buttonOptions: List<String>) {
-        println("DEBUG: addPositionRowWithOptions called")
-        println("DEBUG: position = $position")
-        println("DEBUG: buttonOptions = $buttonOptions")
 
         val row = TableRow(this).apply {
             layoutParams = TableRow.LayoutParams(
@@ -406,16 +378,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        println("DEBUG: Creating buttons")
         buttonOptions.forEach { buttonAction ->
-            println("DEBUG: Creating button for action: $buttonAction")
             val button = createActionButton(buttonAction, position, false)
             buttonsLayout.addView(button)
         }
 
-        println("DEBUG: Adding buttonsLayout to row")
         row.addView(buttonsLayout)
-        println("DEBUG: Adding row to table")
         actionTable.addView(row)
     }
 
@@ -520,7 +488,8 @@ class MainActivity : AppCompatActivity() {
         // Check if this is the user's selected position
         val isUserPosition = position == positionDropdown.text.toString()
 
-        if (isUserPosition && (action == "raise" || action == "3bet" || action == "4bet")) {
+        if ((isUserPosition && (action == "raise" || action == "3bet" || action == "4bet")) ||
+            (position == firstRaisePosition && action == "4bet")) {
             // Handle user's aggressive action
             when (action) {
                 "raise" -> {
@@ -536,7 +505,7 @@ class MainActivity : AppCompatActivity() {
                 "4bet" -> {
                     first4BetPosition = position
                     updateTableAfterUserAction(position, "4bet")
-                    updateSubsequentActions(position, "4bet")
+                    //updateSubsequentActions(position, "4bet")
                 }
             }
         } else if (isDeEscalation) {
@@ -752,6 +721,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
     private fun resetBettingStates() {
         firstRaisePosition = null
         first3BetPosition = null
@@ -767,9 +747,20 @@ class MainActivity : AppCompatActivity() {
         actionSummaryText.visibility = if (actions.isNotEmpty()) View.VISIBLE else View.GONE
     }
 
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private fun setupPreviousActionInfo() {
         val infoIcon = findViewById<ImageView>(R.id.previousActionInfoIcon)
@@ -904,6 +895,10 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 
     companion object {
