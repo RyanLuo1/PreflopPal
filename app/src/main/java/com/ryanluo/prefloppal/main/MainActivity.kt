@@ -405,6 +405,12 @@ class MainActivity : AppCompatActivity() {
                 TableRow.LayoutParams.WRAP_CONTENT
             )
             setPadding(8, 8, 8, 8)
+
+            // Add background color for user's position
+            if (isSelectedPosition) {
+                setBackgroundColor(getColor(R.color.light_purple))  // Use your light purple color
+            }
+
         }
 
         // Position name
@@ -446,6 +452,11 @@ class MainActivity : AppCompatActivity() {
                 TableRow.LayoutParams.WRAP_CONTENT
             )
             setPadding(8, 8, 8, 8)
+
+            // Add background color for user's position
+            if (position == positionDropdown.text.toString()) {
+                setBackgroundColor(getColor(R.color.light_purple))
+            }
         }
 
         // Position name
@@ -607,11 +618,13 @@ class MainActivity : AppCompatActivity() {
                     var i = 0
                     while (i < actionTable.childCount) {
                         val row = actionTable.getChildAt(i) as? TableRow ?: continue
-                        val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
+                        val posText =
+                            row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
 
                         // Remove any response rows (both 3bet and 4bet responses)
                         if ((posText == firstRaisePosition || posText == first3BetPosition) &&
-                            i > allPositions.indexOf(posText!!)) {
+                            i > allPositions.indexOf(posText!!)
+                        ) {
                             actionTable.removeViewAt(i)
                         } else {
                             i++
@@ -626,6 +639,7 @@ class MainActivity : AppCompatActivity() {
                     // Reset remaining positions
                     resetPositionsAfter(position, action)
                 }
+
                 position == first3BetPosition -> {
                     println("DEBUG: 3bettor (${position}) de-escalating from 3bet to ${action}")
 
@@ -633,11 +647,13 @@ class MainActivity : AppCompatActivity() {
                     var i = 0
                     while (i < actionTable.childCount) {
                         val row = actionTable.getChildAt(i) as? TableRow ?: continue
-                        val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
+                        val posText =
+                            row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
 
                         // Remove original raiser's response row and any 4bet related rows
                         if ((posText == firstRaisePosition || posText == first3BetPosition) &&
-                            i > allPositions.indexOf(posText!!)) {
+                            i > allPositions.indexOf(posText!!)
+                        ) {
                             actionTable.removeViewAt(i)
                         } else {
                             i++
@@ -651,6 +667,7 @@ class MainActivity : AppCompatActivity() {
                         updateSubsequentActions(firstRaisePosition!!, "raise")
                     }
                 }
+
                 position == first4BetPosition -> {
                     println("DEBUG: 4bettor (${position}) de-escalating from 4bet to ${action}")
 
@@ -666,9 +683,13 @@ class MainActivity : AppCompatActivity() {
                         var i = 0
                         while (i < actionTable.childCount) {
                             val row = actionTable.getChildAt(i) as? TableRow ?: continue
-                            val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString()
+                            val posText =
+                                row.getChildAt(0)?.let { it as? TextView }?.text?.toString()
 
-                            if (posText == first3BetPosition && i > allPositions.indexOf(first3BetPosition!!)) {
+                            if (posText == first3BetPosition && i > allPositions.indexOf(
+                                    first3BetPosition!!
+                                )
+                            ) {
                                 actionTable.removeViewAt(i)
                             } else {
                                 i++
@@ -677,15 +698,39 @@ class MainActivity : AppCompatActivity() {
                     }
                     // If someone else was the 4bettor
                     else {
+                        // First update all positions after the 4bettor back to fold/call/4bet
+                        for (i in 0 until actionTable.childCount) {
+                            val row = actionTable.getChildAt(i) as? TableRow ?: continue
+                            val posText =
+                                row.getChildAt(0)?.let { it as? TextView }?.text?.toString()
+                                    ?: continue
+
+                            if (allPositions.indexOf(posText) > allPositions.indexOf(position)) {
+                                val buttonsLayout = row.getChildAt(1) as LinearLayout
+                                buttonsLayout.removeAllViews()
+                                listOf("fold", "call", "4bet").forEach { buttonAction ->
+                                    buttonsLayout.addView(
+                                        createActionButton(
+                                            buttonAction,
+                                            posText,
+                                            false
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
                         // Remove all fold/all-in response rows
                         var i = 0
                         while (i < actionTable.childCount) {
                             val row = actionTable.getChildAt(i) as? TableRow ?: continue
-                            val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString()
+                            val posText =
+                                row.getChildAt(0)?.let { it as? TextView }?.text?.toString()
 
                             // Remove response rows for both original raiser and 3bettor
                             if ((posText == firstRaisePosition || posText == first3BetPosition) &&
-                                i > allPositions.indexOf(posText!!)) {
+                                i > allPositions.indexOf(posText!!)
+                            ) {
                                 actionTable.removeViewAt(i)
                             } else {
                                 i++
@@ -924,12 +969,63 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateActionSummary() {
-        val actions = positionActions.entries
-            .filter { it.value != "fold" }
-            .joinToString(", ") { "${it.key} ${it.value}s" }
+        val actionSequence = mutableListOf<String>()
 
-        actionSummaryText.text = actions
-        actionSummaryText.visibility = if (actions.isNotEmpty()) View.VISIBLE else View.GONE
+        // Add the initial raise if it exists
+        if (firstRaisePosition != null) {
+            actionSequence.add("${firstRaisePosition} raises")
+
+            // Add any calls or folds between raise and 3bet
+            positionActions.entries.forEach { (position, action) ->
+                val posIndex = getPositionIndex(position)
+                val raiseIndex = getPositionIndex(firstRaisePosition!!)
+                val threeBetIndex = if (first3BetPosition != null) getPositionIndex(first3BetPosition!!) else -1
+
+                // Only add actions that occurred after raise but before 3bet
+                if (posIndex > raiseIndex && (threeBetIndex == -1 || posIndex < threeBetIndex)) {
+                    if (action == "call") actionSequence.add("$position calls")
+                }
+            }
+        }
+
+        // Add the 3bet if it exists
+        if (first3BetPosition != null) {
+            actionSequence.add("${first3BetPosition} 3-bets")
+
+            // Add any calls or folds between 3bet and 4bet
+            positionActions.entries.forEach { (position, action) ->
+                val posIndex = getPositionIndex(position)
+                val threeBetIndex = getPositionIndex(first3BetPosition!!)
+                val fourBetIndex = if (first4BetPosition != null) getPositionIndex(first4BetPosition!!) else -1
+
+                if (posIndex > threeBetIndex && (fourBetIndex == -1 || posIndex < fourBetIndex)) {
+                    if (action == "call") actionSequence.add("$position calls")
+                }
+            }
+        }
+
+        // Add the 4bet if it exists
+        if (first4BetPosition != null) {
+            actionSequence.add("${first4BetPosition} 4-bets")
+
+            // Add any all-ins after 4bet (from any position)
+            positionActions.entries.forEach { (position, action) ->
+                if (action == "all in") {
+                    actionSequence.add("$position All in")
+                }
+            }
+        }
+
+        actionSummaryText.text = actionSequence.joinToString(", ")
+        actionSummaryText.visibility = if (actionSequence.isNotEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun getPositionIndex(position: String): Int {
+        val allPositions = when(currentTableSize) {
+            "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
+            else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+        }
+        return allPositions.indexOf(position)
     }
 
 
