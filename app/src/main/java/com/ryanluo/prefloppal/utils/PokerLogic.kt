@@ -66,182 +66,43 @@ object PokerLogic {
     private val NINE_MAX_FACING_THREE_BET_RANGES = Nine_Max_FacingThreeBetRanges.RANGES
 
 
-    private fun parsePreviousAction(previousAction: String, tableSize: TableSize): List<Pair<String, String>> {
-        if (previousAction.isBlank() || previousAction.toLowerCase() == "no action") {
+    private fun parseActionSummary(actionSummary: String, tableSize: TableSize): List<Pair<String, String>> {
+        if (actionSummary.isBlank()) {
             return emptyList()
         }
 
-        // Split on multiple delimiters including "then", commas, and periods
-        val actions = previousAction
-            .replace(" then ", ",")  // Replace "then" with comma
-            .replace(" and ", ",")   // Replace "and" with comma
-            .replace(";", ",")       // Replace semicolon with comma
-            .split(Regex("[,.]"))
-            .map { it.trim().toLowerCase() }
-
-        val positionPhrases = listOf(
-            "under the gun" to "UTG",
-            "utg plus one" to "UTG+1",
-            "utg plus two" to "UTG+2",
-            "middle position" to "MP",
-            "low jack" to "LJ",
-            "high jack" to "HJ",
-            "cut off" to "CO",
-            "small blind" to "SB",
-            "big blind" to "BB"
-        )
-
-        val positionMap = when (tableSize) {
-            TableSize.NINE_MAX -> mapOf(
-                "utg" to "UTG",
-                "underthegun" to "UTG",
-                "utg+1" to "UTG+1",
-                "utgplusone" to "UTG+1",
-                "utg+2" to "UTG+2",
-                "utgplustwo" to "UTG+2",
-                "mp" to "LJ",
-                "lj" to "LJ",
-                "lowjack" to "LJ",
-                "hj" to "HJ",
-                "highjack" to "HJ",
-                "co" to "CO",
-                "cutoff" to "CO",
-                "btn" to "BTN",
-                "button" to "BTN",
-                "sb" to "SB",
-                "smallblind" to "SB",
-                "bb" to "BB",
-                "bigblind" to "BB"
-            )
-            TableSize.SIX_MAX -> mapOf(
-                "utg" to "UTG",
-                "underthegun" to "UTG",
-                "utg+1" to "UTG",
-                "utgplusone" to "UTG",
-                "utg+2" to "UTG",
-                "utgplustwo" to "UTG",
-                "mp" to "MP",
-                "middleposition" to "MP",
-                "lj" to "MP",
-                "lowjack" to "MP",
-                "hj" to "MP",
-                "highjack" to "MP",
-                "co" to "CO",
-                "cutoff" to "CO",
-                "btn" to "BTN",
-                "button" to "BTN",
-                "sb" to "SB",
-                "smallblind" to "SB",
-                "bb" to "BB",
-                "bigblind" to "BB"
-            )
-        }
-
-        val actionKeywords = mapOf(
-            // Fold variations
-            "folds" to "folds",
-            "fold" to "folds",
-            "folded" to "folds",
-            "mucks" to "folds",
-            "passes" to "folds",
-
-            // Raise variations
-            "raises" to "raises",
-            "raise" to "raises",
-            "raised" to "raises",
-            "opens" to "raises",
-            "open" to "raises",
-            "bets" to "raises",
-            "bet" to "raises",
-            "rfi" to "raises",
-
-            // 3-bet variations
-            "3 bets" to "3-bets",
-            "3bet" to "3-bets",
-            "3-bet" to "3-bets",
-            "3 bet" to "3-bets",
-            "3!" to "3-bets",
-            "3b" to "3-bets",
-            "3!" to "3-bets",
-            "3betting" to "3-bets",
-            "3-betting" to "3-bets",
-            "reraised" to "3-bets",
-            "reraise" to "3-bets",
-            "reraises" to "3-bets",
-
-            // 4-bet variations
-            "4 bets" to "4-bets",
-            "4bet" to "4-bets",
-            "4-bet" to "4-bets",
-            "4 bet" to "4-bets",
-            "4!" to "4-bets",
-            "4b" to "4-bets",
-            "4betting" to "4-bets",
-            "4-betting" to "4-bets",
-        )
-
         val parsedActions = mutableListOf<Pair<String, String>>()
-        var raiseCount = 0
+        val actions = actionSummary.split(", ")
 
         for (action in actions) {
-            val words = action.split(Regex("\\s+"))
-            var position: String? = null
-            var actionType: String? = null
-
-            // Try to match position first
-            val fullText = words.joinToString(" ").toLowerCase()
-
-            // First try matching full phrases
-            for ((phrase, pos) in positionPhrases) {
-                if (fullText.contains(phrase)) {
-                    position = pos
-                    break
+            val parts = action.split(" ")
+            if (parts.size >= 2) {
+                val position = parts[0]  // Already standardized (UTG, MP, etc.)
+                val actionType = when (parts[1]) {
+                    "raises" -> "raises"
+                    "3-bets" -> "3-bets"
+                    "4-bets" -> "4-bets"
+                    "calls" -> "calls"
+                    "All" -> "all in"  // Handle "All in" case
+                    else -> continue
                 }
-            }
-
-            // If no phrase match, try single word matches
-            if (position == null) {
-                val joinedWords = words.joinToString("").toLowerCase()
-                position = positionMap[joinedWords] ?: positionMap[fullText] ?: words
-                    .asSequence()
-                    .map { it.toLowerCase().replace(" ", "") }
-                    .firstNotNullOfOrNull { positionMap[it] }
-            }
-
-            // Look for action type
-            for (word in words) {
-                val lowercaseWord = word.toLowerCase()
-                if (actionType == null) {
-                    actionType = actionKeywords[lowercaseWord]
-                }
-            }
-
-            if (position != null && actionType != null) {
-                if (actionType == "raises") {
-                    raiseCount++
-                    if (raiseCount > 1) {
-                        actionType = "3-bets"
-                    }
-                }
-                if (actionType == "3-bets" ||actionType == "4-bets") {
-                    raiseCount++
-                }
-
-                if (raiseCount > 2) {
-                    throw IllegalStateException("PreFlopPal currently doesn't handle actions beyond 3-bets.")
-                }
-
                 parsedActions.add(Pair(position, actionType))
             }
         }
 
-        return parsedActions
+        // Validate against table size
+        val validPositions = when (tableSize) {
+            TableSize.NINE_MAX -> NINE_MAX_POSITIONS
+            TableSize.SIX_MAX -> SIX_MAX_POSITIONS
+        }
+
+        return parsedActions.filter { it.first in validPositions }
     }
 
-    fun getAdvice(hand: Hand, position: String, previousAction: String?, tableSize: TableSize): Triple<String, String, Double> {
+    fun getAdvice(hand: Hand, position: String, actionSummary: String?, tableSize: TableSize): Triple<String, String, Double> {
         val handKey = hand.toKey()
         val handStrength = calculateHandStrength(hand, position)
-        val actions = parsePreviousAction(previousAction ?: "",tableSize)
+        val actions = parseActionSummary(actionSummary ?: "", tableSize)
         val lastRaise = actions.lastOrNull { it.second == "raises" || it.second == "3-bets" }
 
         val advice: String
@@ -270,7 +131,7 @@ object PokerLogic {
 
 
         when {
-            actions.isEmpty() || previousAction.isNullOrBlank() || previousAction == "No action" || actions.all { it.second == "folds" } -> {
+            actions.isEmpty() || actionSummary.isNullOrBlank() || actionSummary == "No action" || actions.all { it.second == "folds" } -> {
                 // RFI situation
                 if (position in rfiRanges && rfiRanges[position]?.contains(hand) == true) {
                     advice = "Raise"
