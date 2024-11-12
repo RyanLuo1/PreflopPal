@@ -236,9 +236,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
-
     private fun updateActionTableForPosition(selectedPosition: String) {
         // Clear existing table and actions
         actionTable.removeAllViews()
@@ -685,21 +682,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Make sure all buttons reflect their correct state
+        // Make sure all buttons reflect their correct state
         for (i in 0 until actionTable.childCount) {
             val row = actionTable.getChildAt(i) as? TableRow ?: continue
             val posText = (row.getChildAt(0) as? TextView)?.text?.toString() ?: continue
             val buttonLayout = row.getChildAt(1) as? LinearLayout ?: continue
 
+            // Flag to indicate whether this position has been processed in a special case
+            var specialCaseHandled = false
+
             // Special case: if this is the original raiser's first row and they later go all in,
-            // keep the raise button highlighted
             if (posText == firstRaisePosition && i == allPositions.indexOf(firstRaisePosition!!) &&
-                (first4BetPosition == firstRaisePosition || positionActions[posText] == "all in")
+                (positionActions[posText] == "4bet" || positionActions[posText] == "all in")
             ) {
                 for (j in 0 until buttonLayout.childCount) {
                     val button = buttonLayout.getChildAt(j) as? MaterialButton ?: continue
                     val buttonAction = button.text.toString().lowercase()
                     updateButtonAppearance(button, buttonAction == "raise")
                 }
+                specialCaseHandled = true // Set the flag
             }
 
             // Special case: if this is the position that made the first 3bet and they later go all in,
@@ -712,9 +713,11 @@ class MainActivity : AppCompatActivity() {
                     val buttonAction = button.text.toString().lowercase()
                     updateButtonAppearance(button, buttonAction == "3bet")
                 }
+                specialCaseHandled = true // Set the flag
+            }
 
-            } else {
-                // Normal button state update
+            // Normal button state update only if no special case was handled
+            if (!specialCaseHandled) {
                 for (j in 0 until buttonLayout.childCount) {
                     val button = buttonLayout.getChildAt(j) as? MaterialButton ?: continue
                     val buttonAction = button.text.toString().lowercase()
