@@ -297,10 +297,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "3bet" -> {
-                firstRaisePosition?.let { raisePos ->
-                    positionsToAdd.add(raisePos)
-                }
-
+                // First add all positions through BB
                 val userIndex = allPositions.indexOf(userPosition)
                 if (userIndex != -1 && userPosition == positionDropdown.text.toString()) {
                     val positionsToShow = allPositions.subList(userIndex + 1, allPositions.size)
@@ -318,6 +315,11 @@ class MainActivity : AppCompatActivity() {
                             positionsToAdd.add(position)
                         }
                     }
+                }
+
+                // Then add the original raiser's response row last
+                firstRaisePosition?.let { raisePos ->
+                    positionsToAdd.add(raisePos)
                 }
             }
             "4bet" -> {
@@ -584,29 +586,51 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 position == first4BetPosition -> {
-                    // Remove only the responder's row (3bettor's fold/all in row)
-                    var i = 0
-                    while (i < actionTable.childCount) {
-                        val row = actionTable.getChildAt(i) as? TableRow
-                        val posText = row?.getChildAt(0)?.let { it as? TextView }?.text?.toString()
+                    // Store who was the 4bettor before we null it
+                    val was4Bettor = first4BetPosition
 
-                        if (posText == first3BetPosition && i > allPositions.indexOf(first3BetPosition!!)) {
-                            actionTable.removeViewAt(i)
-                        } else {
-                            // If this is the 4bettor's row, restore their original buttons
-                            if (posText == position) {
-                                val buttonsLayout = row.getChildAt(1) as LinearLayout
-                                buttonsLayout.removeAllViews()
-                                listOf("fold", "call", "4bet").forEach { buttonAction ->
-                                    buttonsLayout.addView(createActionButton(buttonAction, posText, false))
-                                }
+                    // Clear 4bet state first
+                    first4BetPosition = null
+
+                    // If original raiser was the 4bettor
+                    if (was4Bettor == firstRaisePosition) {
+                        // Remove only the 3bettor's fold/all-in row
+                        var i = 0
+                        while (i < actionTable.childCount) {
+                            val row = actionTable.getChildAt(i) as? TableRow
+                            val posText = row?.getChildAt(0)?.let { it as? TextView }?.text?.toString()
+
+                            if (posText == first3BetPosition && i > allPositions.indexOf(first3BetPosition!!)) {
+                                actionTable.removeViewAt(i)
+                            } else {
+                                i++
                             }
-                            i++
                         }
                     }
+                    // If someone else was the 4bettor
+                    else {
+                        // Remove all fold/all-in response rows
+                        var i = 0
+                        while (i < actionTable.childCount) {
+                            val row = actionTable.getChildAt(i) as? TableRow
+                            val posText = row?.getChildAt(0)?.let { it as? TextView }?.text?.toString()
 
-                    first4BetPosition = null
-                    //resetPositionsAfter(position, action)
+                            // Remove response rows for both original raiser and 3bettor
+                            if ((posText == firstRaisePosition || posText == first3BetPosition) &&
+                                i > allPositions.indexOf(posText!!)) {
+                                actionTable.removeViewAt(i)
+                            } else {
+                                i++
+                            }
+                        }
+
+                        // If needed, add back the appropriate response row for the original raiser
+                        if (first3BetPosition != null) {
+                            firstRaisePosition?.let { raisePos ->
+                                addPositionRowWithOptions(raisePos, listOf("fold", "call", "4bet"))
+                            }
+                        }
+                    }
                 }
                 position == firstRaisePosition -> {
                     firstRaisePosition = null
@@ -666,10 +690,36 @@ class MainActivity : AppCompatActivity() {
             val posText = (row.getChildAt(0) as? TextView)?.text?.toString() ?: continue
             val buttonLayout = row.getChildAt(1) as? LinearLayout ?: continue
 
-            for (j in 0 until buttonLayout.childCount) {
-                val button = buttonLayout.getChildAt(j) as? MaterialButton ?: continue
-                val buttonAction = button.text.toString().lowercase()
-                updateButtonAppearance(button, positionActions[posText] == buttonAction)
+            // Special case: if this is the original raiser's first row and they later go all in,
+            // keep the raise button highlighted
+            if (posText == firstRaisePosition && i == allPositions.indexOf(firstRaisePosition!!) &&
+                (first4BetPosition == firstRaisePosition || positionActions[posText] == "all in")
+            ) {
+                for (j in 0 until buttonLayout.childCount) {
+                    val button = buttonLayout.getChildAt(j) as? MaterialButton ?: continue
+                    val buttonAction = button.text.toString().lowercase()
+                    updateButtonAppearance(button, buttonAction == "raise")
+                }
+            }
+
+            // Special case: if this is the position that made the first 3bet and they later go all in,
+            // keep the 3bet button highlighted
+            if (posText == first3BetPosition && i == allPositions.indexOf(first3BetPosition!!) &&
+                positionActions[posText] == "all in"
+            ) {
+                for (j in 0 until buttonLayout.childCount) {
+                    val button = buttonLayout.getChildAt(j) as? MaterialButton ?: continue
+                    val buttonAction = button.text.toString().lowercase()
+                    updateButtonAppearance(button, buttonAction == "3bet")
+                }
+
+            } else {
+                // Normal button state update
+                for (j in 0 until buttonLayout.childCount) {
+                    val button = buttonLayout.getChildAt(j) as? MaterialButton ?: continue
+                    val buttonAction = button.text.toString().lowercase()
+                    updateButtonAppearance(button, positionActions[posText] == buttonAction)
+                }
             }
         }
 
