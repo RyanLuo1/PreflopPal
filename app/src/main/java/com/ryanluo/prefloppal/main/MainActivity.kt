@@ -263,10 +263,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateTableAfterUserAction(userPosition: String, userAction: String) {
-
         val allPositions = when(currentTableSize) {
             "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
             else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+        }
+
+        // If this is a 4bet, first update any existing response rows to fold/all-in
+        // ONLY if the 4bettor is not the original raiser
+        if (userAction == "4bet" && userPosition != firstRaisePosition) {
+            for (i in 0 until actionTable.childCount) {
+                val row = actionTable.getChildAt(i) as? TableRow ?: continue
+                val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
+
+                if ((posText == firstRaisePosition || posText == first3BetPosition) &&
+                    i > allPositions.indexOf(posText!!)) {
+                    val buttonsLayout = row.getChildAt(1) as? LinearLayout ?: continue
+                    buttonsLayout.removeAllViews()
+                    listOf("fold", "all in").forEach { buttonAction ->
+                        buttonsLayout.addView(createActionButton(buttonAction, posText, false))
+                    }
+                }
+            }
         }
 
         // Determine which positions need to show up
@@ -280,9 +297,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "3bet" -> {
+                firstRaisePosition?.let { raisePos ->
+                    positionsToAdd.add(raisePos)
+                }
+
                 val userIndex = allPositions.indexOf(userPosition)
                 if (userIndex != -1 && userPosition == positionDropdown.text.toString()) {
-                    // Only add positions that aren't already shown
                     val positionsToShow = allPositions.subList(userIndex + 1, allPositions.size)
                     positionsToShow.forEach { position ->
                         var exists = false
@@ -299,23 +319,11 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                firstRaisePosition?.let { raisePos ->
-                    positionsToAdd.add(raisePos)
-                }
             }
             "4bet" -> {
-                // Check if 3bettor's response row already exists to avoid duplicates
+                // Only add the 3bettor's response if they don't already have a response row
                 first3BetPosition?.let { threeBetPos ->
-                    var exists = false
-                    for (i in 0 until actionTable.childCount) {
-                        val row = actionTable.getChildAt(i) as? TableRow
-                        val posText = row?.getChildAt(0)?.let { it as? TextView }?.text?.toString()
-                        if (posText == threeBetPos) {
-                            exists = false  // Reset exists since we want a new response row
-                            break
-                        }
-                    }
-                    if (!exists) {
+                    if (!hasResponseRow(threeBetPos)) {
                         positionsToAdd.add(threeBetPos)
                     }
                 }
@@ -340,6 +348,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun hasResponseRow(position: String): Boolean {
+        val allPositions = when(currentTableSize) {
+            "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
+            else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+        }
+
+        val positionIndex = allPositions.indexOf(position)
+        for (i in 0 until actionTable.childCount) {
+            val row = actionTable.getChildAt(i) as? TableRow ?: continue
+            val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString()
+            if (posText == position && i > positionIndex) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun addPositionRow(position: String, isSelectedPosition: Boolean) {
