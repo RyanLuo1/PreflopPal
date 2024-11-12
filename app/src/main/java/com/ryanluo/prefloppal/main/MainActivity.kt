@@ -27,6 +27,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.ryanluo.prefloppal.dialogs.AdviceDialogFragment
@@ -265,19 +266,39 @@ class MainActivity : AppCompatActivity() {
             else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
         }
 
-        // If this is a 4bet, first update any existing response rows to fold/all-in
-        // ONLY if the 4bettor is not the original raiser
-        if (userAction == "4bet" && userPosition != firstRaisePosition) {
-            for (i in 0 until actionTable.childCount) {
-                val row = actionTable.getChildAt(i) as? TableRow ?: continue
-                val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
+        // If this is a 4bet, update appropriate rows to fold/all-in
+        if (userAction == "4bet") {
+            if (userPosition == firstRaisePosition) {
+                // If original raiser is 4betting, only update 3bettor's response row
+                first3BetPosition?.let { threeBetPos ->
+                    for (i in 0 until actionTable.childCount) {
+                        val row = actionTable.getChildAt(i) as? TableRow ?: continue
+                        val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
 
-                if ((posText == firstRaisePosition || posText == first3BetPosition) &&
-                    i > allPositions.indexOf(posText!!)) {
-                    val buttonsLayout = row.getChildAt(1) as? LinearLayout ?: continue
-                    buttonsLayout.removeAllViews()
-                    listOf("fold", "all in").forEach { buttonAction ->
-                        buttonsLayout.addView(createActionButton(buttonAction, posText, false))
+                        if (posText == threeBetPos && i > allPositions.indexOf(threeBetPos)) {
+                            val buttonsLayout = row.getChildAt(1) as? LinearLayout ?: continue
+                            buttonsLayout.removeAllViews()
+                            listOf("fold", "all in").forEach { buttonAction ->
+                                buttonsLayout.addView(createActionButton(buttonAction, posText, false))
+                            }
+                        }
+                    }
+                }
+            } else {
+                // If someone else is 4betting, update all appropriate rows
+                for (i in 0 until actionTable.childCount) {
+                    val row = actionTable.getChildAt(i) as? TableRow ?: continue
+                    val posText = row.getChildAt(0)?.let { it as? TextView }?.text?.toString() ?: continue
+
+                    if ((posText == firstRaisePosition || posText == first3BetPosition) &&
+                        i > allPositions.indexOf(posText!!) ||
+                        allPositions.indexOf(posText) > allPositions.indexOf(userPosition)) {
+
+                        val buttonsLayout = row.getChildAt(1) as? LinearLayout ?: continue
+                        buttonsLayout.removeAllViews()
+                        listOf("fold", "all in").forEach { buttonAction ->
+                            buttonsLayout.addView(createActionButton(buttonAction, posText, false))
+                        }
                     }
                 }
             }
@@ -367,6 +388,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addPositionRow(position: String, isSelectedPosition: Boolean) {
+        val customFont = ResourcesCompat.getFont(this, R.font.nunito_bold)
+
         val row = TableRow(this).apply {
             layoutParams = TableRow.LayoutParams(
                 TableRow.LayoutParams.MATCH_PARENT,
@@ -378,9 +401,10 @@ class MainActivity : AppCompatActivity() {
         // Position name
         TextView(this).apply {
             text = position
-            textSize = 16f
+            textSize = 18f
             setPadding(16, 8, 16, 8)
             setTextColor(getColor(R.color.dark_purple))
+            typeface = customFont
         }.also { row.addView(it) }
 
         // Add action buttons
@@ -405,6 +429,7 @@ class MainActivity : AppCompatActivity() {
 
     // Add this helper function
     private fun addPositionRowWithOptions(position: String, buttonOptions: List<String>) {
+        val customFont = ResourcesCompat.getFont(this, R.font.nunito_bold)
 
         val row = TableRow(this).apply {
             layoutParams = TableRow.LayoutParams(
@@ -417,9 +442,10 @@ class MainActivity : AppCompatActivity() {
         // Position name
         TextView(this).apply {
             text = position
-            textSize = 16f
+            textSize = 18f
             setPadding(16, 8, 16, 8)
             setTextColor(getColor(R.color.dark_purple))
+            typeface = customFont
         }.also { row.addView(it) }
 
         // Add buttons layout
@@ -475,7 +501,8 @@ class MainActivity : AppCompatActivity() {
     private fun createActionButton(action: String, position: String, isSelectedPosition: Boolean): MaterialButton {
         return MaterialButton(this, null, R.style.Widget_MaterialComponents_Button_OutlinedButton).apply {
             text = action.capitalize()
-            textSize = 14f
+            setTypeface(typeface, Typeface.BOLD)
+            textSize = 16f
             setTextColor(getColor(R.color.dark_purple))
             backgroundTintList = ColorStateList.valueOf(getColor(R.color.white))
             strokeColor = ColorStateList.valueOf(getColor(R.color.primary_purple))
@@ -492,6 +519,9 @@ class MainActivity : AppCompatActivity() {
                 marginEnd = 8
             }
             setPadding(12.dpToPx(), 0, 12.dpToPx(), 0)  // Add horizontal padding
+
+            // Center the text within the button
+            gravity = Gravity.CENTER
 
             setOnClickListener {
                 handleActionClick(this, position, action)
