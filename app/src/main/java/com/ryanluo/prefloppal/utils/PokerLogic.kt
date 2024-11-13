@@ -1,9 +1,10 @@
 package com.ryanluo.prefloppal.utils
 
-import com.ryanluo.prefloppal.models.Nine_Max_RFICallingRanges
+import com.ryanluo.prefloppal.models.Nine_Max_FacingFourBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_FacingThreeBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_RFIThreeBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_RFI_Ranges
+import com.ryanluo.prefloppal.models.Six_Max_FacingFourBetRanges
 
 import com.ryanluo.prefloppal.models.Six_Max_FacingThreeBetRanges
 import com.ryanluo.prefloppal.models.Six_Max_RFICallingRanges
@@ -61,7 +62,6 @@ object PokerLogic {
 
     // 9max ranges (placeholders - you'll implement these)
     private val NINE_MAX_RFI_RANGES = Nine_Max_RFI_Ranges.RANGES
-    private val NINE_MAX_CALLING_RANGES = Nine_Max_RFICallingRanges.RANGES
     private val NINE_MAX_THREE_BET_RANGES = Nine_Max_RFIThreeBetRanges.RANGES
     private val NINE_MAX_FACING_THREE_BET_RANGES = Nine_Max_FacingThreeBetRanges.RANGES
 
@@ -103,7 +103,7 @@ object PokerLogic {
         val handKey = hand.toKey()
         val handStrength = calculateHandStrength(hand, position)
         val actions = parseActionSummary(actionSummary ?: "", tableSize)
-        val lastRaise = actions.lastOrNull { it.second == "raises" || it.second == "3-bets" }
+        val lastRaise = actions.lastOrNull { it.second in listOf("raises", "3-bets", "4-bets") }
 
         val advice: String
         val explanation: String
@@ -112,11 +112,6 @@ object PokerLogic {
         val rfiRanges = when(tableSize) {
             TableSize.SIX_MAX -> SIX_MAX_RFI_RANGES
             TableSize.NINE_MAX -> NINE_MAX_RFI_RANGES
-        }
-
-        val rfiCallingRanges = when(tableSize) {
-            TableSize.SIX_MAX -> Six_Max_RFICallingRanges.RANGES
-            TableSize.NINE_MAX -> Nine_Max_RFICallingRanges.RANGES
         }
 
         val rfiThreeBetRanges = when(tableSize) {
@@ -129,6 +124,10 @@ object PokerLogic {
             TableSize.NINE_MAX -> Nine_Max_FacingThreeBetRanges.RANGES
         }
 
+        val facingFourBetRanges = when(tableSize) {
+            TableSize.SIX_MAX -> Six_Max_FacingFourBetRanges.RANGES
+            TableSize.NINE_MAX -> Nine_Max_FacingFourBetRanges.RANGES
+        }
 
         when {
             actions.isEmpty() || actionSummary.isNullOrBlank() || actionSummary == "No action" || actions.all { it.second == "folds" } -> {
@@ -141,7 +140,40 @@ object PokerLogic {
                     explanation = "Your hand ($handKey) isn't ideal for raising from $position. It's better to fold and wait for a stronger spot."
                 }
             }
+            lastRaise?.second == "4-bets" -> {
+                val fourBetPosition = lastRaise.first
+                if (position in facingFourBetRanges && fourBetPosition in facingFourBetRanges[position].orEmpty()) {
+                    val facingFourBetRange = facingFourBetRanges[position]!![fourBetPosition]!!
+                    when {
+                        facingFourBetRange.allInRange.contains(hand) -> {
+                            advice = "All-In"
+                            explanation = "This hand ($handKey) is strong enough to move all-in against a 4-bet from $fourBetPosition when you're in $position. " +
+                                    "Your hand is at the top of your range and performs well enough to commit your stack."
+                        }
+                        facingFourBetRange.callRange.contains(hand) -> {
+                            advice = "Call"
+                            explanation = "This hand ($handKey) is strong enough to call a 4-bet from $fourBetPosition when you're in $position. " +
+                                    "While not strong enough to move all-in, it has good playability and equity to continue."
+                        }
+                        facingFourBetRange.bluffRange.contains(hand) -> {
+                            advice = "All-In as a Bluff or Fold"
+                            explanation = "This hand ($handKey) can be used as an all-in bluff against a 4-bet from $fourBetPosition when you're in $position. " +
+                                    "While risky, occasionally moving all-in with these hands helps balance your range and prevents opponents from exploiting you. " +
+                                    "However, folding is also acceptable if you're not comfortable with the spot."
+                        }
+                        else -> {
+                            advice = "Fold"
+                            explanation = "This hand ($handKey) isn't strong enough to continue against a 4-bet from $fourBetPosition when you're in $position. " +
+                                    "The pot odds and implied odds don't justify continuing with this hand."
+                        }
+                    }
+                } else {
+                    advice = "Fold"
+                    explanation = "There's no defined strategy for this position ($position) against a 4-bet from $fourBetPosition. It's safest to fold."
+                }
+            }
             lastRaise?.second == "3-bets" -> {
+                // Existing 3-bet logic remains the same
                 val threeBetPosition = lastRaise.first
                 if (position in facingThreeBetRanges && threeBetPosition in facingThreeBetRanges[position].orEmpty()) {
                     val facingThreeBetRange = facingThreeBetRanges[position]!![threeBetPosition]!!
@@ -162,6 +194,10 @@ object PokerLogic {
                             explanation = "This hand ($handKey) is solid enough to call against a 3-bet from $threeBetPosition when you're in $position. " +
                                     "It has the potential to play well post-flop, allowing you to see how the board develops without committing more chips preflop."
                         }
+                        facingThreeBetRange.rcRange.contains(hand) -> {
+                            advice = "Raise or Call"
+                            explanation = "This hand ($handKey) is solid enough to Raise/call mix against a 3-bet from $threeBetPosition when you're in $position."
+                        }
                         else -> {
                             advice = "Fold"
                             explanation = "This hand ($handKey) isn't strong enough to continue against a 3-bet from $threeBetPosition when you're in $position. " +
@@ -173,7 +209,9 @@ object PokerLogic {
                     explanation = "There's no defined strategy for this position ($position) against a 3-bet from $threeBetPosition. It's safest to fold."
                 }
             }
+            // Rest of the existing code remains the same
             lastRaise?.second == "raises" -> {
+                // Existing raise logic remains unchanged
                 val raiserPosition = lastRaise.first
                 if (position in rfiThreeBetRanges && raiserPosition in rfiThreeBetRanges[position].orEmpty()) {
                     val threeBetRange = rfiThreeBetRanges[position]!![raiserPosition]!!
@@ -188,9 +226,17 @@ object PokerLogic {
                             explanation = "This hand ($handKey) is in the 3-bet bluffing range against a raise from $raiserPosition when you're in $position. " +
                                     "3-bet bluffs add pressure on your opponent and also balance your own 3-betting range, but they should only be used a small percentage of the time."
                         }
-                        rfiCallingRanges[position]?.get(raiserPosition)?.contains(hand) == true -> {
+                        threeBetRange.callRange.contains(hand) -> {
                             advice = "Call"
                             explanation = "This hand ($handKey) is in the calling range against a raise from $raiserPosition when you're in $position."
+                        }
+                        threeBetRange.rcRange.contains(hand) -> {
+                            advice = "Mix of Raise/Call"
+                            explanation = "This hand ($handKey) is in the Raise/Call mix range against a raise from $raiserPosition when you're in $position."
+                        }
+                        threeBetRange.fcRange.contains(hand) -> {
+                            advice = "Mix of Fold/Call"
+                            explanation = "This hand ($handKey) is in the Fold/Call mix range against a raise from $raiserPosition when you're in $position."
                         }
                         else -> {
                             advice = "Fold"
