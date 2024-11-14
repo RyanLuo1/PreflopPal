@@ -114,7 +114,7 @@ object PokerLogic {
             TableSize.NINE_MAX -> NINE_MAX_RFI_RANGES
         }
 
-        val rfiThreeBetRanges = when(tableSize) {
+        val facingRaisingRanges = when(tableSize) {
             TableSize.SIX_MAX -> Six_Max_RFIThreeBetRanges.RANGES
             TableSize.NINE_MAX -> Nine_Max_RFIThreeBetRanges.RANGES
         }
@@ -130,8 +130,8 @@ object PokerLogic {
         }
 
         when {
+            // RFI situation
             actions.isEmpty() || actionSummary.isNullOrBlank() || actionSummary == "No action" || actions.all { it.second == "folds" } -> {
-                // RFI situation
                 if (position in rfiRanges && rfiRanges[position]?.contains(hand) == true) {
                     advice = "Raise"
                     explanation = "Your hand ($handKey) is strong enough to raise from $position. It's a good spot to be more aggressive."
@@ -140,40 +140,49 @@ object PokerLogic {
                     explanation = "Your hand ($handKey) isn't ideal for raising from $position. It's better to fold and wait for a stronger spot."
                 }
             }
-            lastRaise?.second == "4-bets" -> {
-                val fourBetPosition = lastRaise.first
-                if (position in facingFourBetRanges && fourBetPosition in facingFourBetRanges[position].orEmpty()) {
-                    val facingFourBetRange = facingFourBetRanges[position]!![fourBetPosition]!!
+
+            // Facing a raise
+            lastRaise?.second == "raises" -> {
+                val raiserPosition = lastRaise.first
+                if (position in facingRaisingRanges && raiserPosition in facingRaisingRanges[position].orEmpty()) {
+                    val threeBetRange = facingRaisingRanges[position]!![raiserPosition]!!
                     when {
-                        facingFourBetRange.allInRange.contains(hand) -> {
-                            advice = "All-In"
-                            explanation = "This hand ($handKey) is strong enough to move all-in against a 4-bet from $fourBetPosition when you're in $position. " +
-                                    "Your hand is at the top of your range and performs well enough to commit your stack."
+                        threeBetRange.valueRange.contains(hand) -> {
+                            advice = "3-Bet for Value"
+                            explanation = "This hand ($handKey) is strong enough to 3-bet for value against a raise from $raiserPosition when you're in $position. " +
+                                    "A value 3-bet here aims to get more chips into the pot with a hand that performs well postflop."
                         }
-                        facingFourBetRange.callRange.contains(hand) -> {
+                        threeBetRange.bluffRange.contains(hand) -> {
+                            advice = "3-Bet as a Bluff or Fold"
+                            explanation = "This hand ($handKey) is in the 3-bet bluffing range against a raise from $raiserPosition when you're in $position. " +
+                                    "3-bet bluffs add pressure on your opponent and also balance your own 3-betting range, but they should only be used a small percentage of the time."
+                        }
+                        threeBetRange.callRange.contains(hand) -> {
                             advice = "Call"
-                            explanation = "This hand ($handKey) is strong enough to call a 4-bet from $fourBetPosition when you're in $position. " +
-                                    "While not strong enough to move all-in, it has good playability and equity to continue."
+                            explanation = "This hand ($handKey) is in the calling range against a raise from $raiserPosition when you're in $position."
                         }
-                        facingFourBetRange.bluffRange.contains(hand) -> {
-                            advice = "All-In as a Bluff or Fold"
-                            explanation = "This hand ($handKey) can be used as an all-in bluff against a 4-bet from $fourBetPosition when you're in $position. " +
-                                    "While risky, occasionally moving all-in with these hands helps balance your range and prevents opponents from exploiting you. " +
-                                    "However, folding is also acceptable if you're not comfortable with the spot."
+                        threeBetRange.rcRange.contains(hand) -> {
+                            advice = "Mix of Raise/Call"
+                            explanation = "This hand ($handKey) is in the Raise/Call mix range against a raise from $raiserPosition when you're in $position."
+                        }
+                        threeBetRange.fcRange.contains(hand) -> {
+                            advice = "Mix of Fold/Call"
+                            explanation = "This hand ($handKey) is in the Fold/Call mix range against a raise from $raiserPosition when you're in $position."
                         }
                         else -> {
                             advice = "Fold"
-                            explanation = "This hand ($handKey) isn't strong enough to continue against a 4-bet from $fourBetPosition when you're in $position. " +
-                                    "The pot odds and implied odds don't justify continuing with this hand."
+                            explanation = "This hand ($handKey) is not strong enough to call or 3-bet against a raise from $raiserPosition when you're in $position. " +
+                                    "Folding is the safest option here."
                         }
                     }
                 } else {
                     advice = "Fold"
-                    explanation = "There's no defined strategy for this position ($position) against a 4-bet from $fourBetPosition. It's safest to fold."
+                    explanation = "There's no defined strategy for this position ($position) against a raise from $raiserPosition. It's safest to fold."
                 }
             }
+
+            // Facing a 3bet
             lastRaise?.second == "3-bets" -> {
-                // Existing 3-bet logic remains the same
                 val threeBetPosition = lastRaise.first
                 if (position in facingThreeBetRanges && threeBetPosition in facingThreeBetRanges[position].orEmpty()) {
                     val facingThreeBetRange = facingThreeBetRanges[position]!![threeBetPosition]!!
@@ -209,46 +218,80 @@ object PokerLogic {
                     explanation = "There's no defined strategy for this position ($position) against a 3-bet from $threeBetPosition. It's safest to fold."
                 }
             }
-            // Rest of the existing code remains the same
-            lastRaise?.second == "raises" -> {
-                // Existing raise logic remains unchanged
-                val raiserPosition = lastRaise.first
-                if (position in rfiThreeBetRanges && raiserPosition in rfiThreeBetRanges[position].orEmpty()) {
-                    val threeBetRange = rfiThreeBetRanges[position]!![raiserPosition]!!
+
+            // Facing a 4bet
+            lastRaise?.second == "4-bets" -> {
+                val fourBetPosition = lastRaise.first
+
+                // Find who made the 3bet
+                val threeBetAction = actions.find { it.second == "3-bets" }
+                val is3Bettor = threeBetAction?.first == position
+
+                if (is3Bettor && position in facingFourBetRanges && fourBetPosition in facingFourBetRanges[position].orEmpty()) {
+                    // User was the 3bettor - use the facing 4bet file
+                    val facingFourBetRange = facingFourBetRanges[position]!![fourBetPosition]!!
                     when {
-                        threeBetRange.valueRange.contains(hand) -> {
-                            advice = "3-Bet for Value"
-                            explanation = "This hand ($handKey) is strong enough to 3-bet for value against a raise from $raiserPosition when you're in $position. " +
-                                    "A value 3-bet here aims to get more chips into the pot with a hand that performs well postflop."
+                        facingFourBetRange.allInRange.contains(hand) -> {
+                            advice = "All-In"
+                            explanation = "As the 3-bettor, your hand ($handKey) is strong enough to move all-in against a 4-bet from $fourBetPosition. " +
+                                    "Since you 3-bet this hand for value, you can continue with a 5-bet all-in."
                         }
-                        threeBetRange.bluffRange.contains(hand) -> {
-                            advice = "3-Bet as a Bluff or Fold"
-                            explanation = "This hand ($handKey) is in the 3-bet bluffing range against a raise from $raiserPosition when you're in $position. " +
-                                    "3-bet bluffs add pressure on your opponent and also balance your own 3-betting range, but they should only be used a small percentage of the time."
-                        }
-                        threeBetRange.callRange.contains(hand) -> {
+                        facingFourBetRange.callRange.contains(hand) -> {
                             advice = "Call"
-                            explanation = "This hand ($handKey) is in the calling range against a raise from $raiserPosition when you're in $position."
+                            explanation = "As the 3-bettor, this hand ($handKey) is strong enough to call a 4-bet from $fourBetPosition. " +
+                                    "While not strong enough to move all-in, it has good playability and equity to continue."
                         }
-                        threeBetRange.rcRange.contains(hand) -> {
-                            advice = "Mix of Raise/Call"
-                            explanation = "This hand ($handKey) is in the Raise/Call mix range against a raise from $raiserPosition when you're in $position."
-                        }
-                        threeBetRange.fcRange.contains(hand) -> {
-                            advice = "Mix of Fold/Call"
-                            explanation = "This hand ($handKey) is in the Fold/Call mix range against a raise from $raiserPosition when you're in $position."
+                        facingFourBetRange.bluffRange.contains(hand) -> {
+                            advice = "All-In as a Bluff or Fold"
+                            explanation = "As the 3-bettor, this hand ($handKey) can be used as an all-in bluff against a 4-bet from $fourBetPosition. " +
+                                    "While risky, occasionally moving all-in with these hands helps balance your range and prevents opponents from exploiting you."
                         }
                         else -> {
                             advice = "Fold"
-                            explanation = "This hand ($handKey) is not strong enough to call or 3-bet against a raise from $raiserPosition when you're in $position. " +
-                                    "Folding is the safest option here."
+                            explanation = "Even though you were the 3-bettor, this hand ($handKey) isn't strong enough to continue against a 4-bet from $fourBetPosition. " +
+                                    "The pot odds and implied odds don't justify continuing with this hand."
                         }
                     }
                 } else {
-                    advice = "Fold"
-                    explanation = "There's no defined strategy for this position ($position) against a raise from $raiserPosition. It's safest to fold."
+                    // User facing a cold 4bet - use simplified logic
+                    when {
+                        setOf("AA", "KK", "AKs").contains(handKey) -> {
+                            advice = "All-In"
+                            explanation = "Facing a cold 4-bet from $fourBetPosition, only the absolute strongest hands ($handKey) can move all-in. " +
+                                    "Your hand is at the top of your range and performs well enough against both the original 3-bettor and the 4-bettor."
+                        }
+                        handKey == "QQ" -> {
+                            advice = "Call"
+                            explanation = "Facing a cold 4-bet from $fourBetPosition, this hand ($handKey) is strong enough to call. " +
+                                    "While not strong enough to move all-in in a multi-way pot, it has enough equity to continue."
+                        }
+                        else -> {
+                            advice = "Fold"
+                            explanation = "Facing a cold 4-bet from $fourBetPosition, this hand ($handKey) isn't strong enough to continue. " +
+                                    "With multiple players showing strength, you should fold all but your strongest hands."
+                        }
+                    }
                 }
             }
+
+            // Facing an all-in
+            lastRaise?.second == "all-in" -> {
+                val allInPosition = lastRaise.first
+                when {
+                    setOf("AA", "KK", "AKs").contains(handKey) -> {
+                        advice = "Call"
+                        explanation = "With ${handKey}, you can call the all-in from $allInPosition. " +
+                                "These premium hands have enough equity to profitably call an all-in."
+                    }
+                    else -> {
+                        advice = "Fold"
+                        explanation = "Even though ${handKey} might be a strong hand, it's not strong enough to call an all-in from $allInPosition. " +
+                                "Only the absolute premium hands (AA, KK, AKs) should continue here."
+                    }
+                }
+            }
+
+            // Unexpected scenario
             else -> {
                 advice = "Fold"
                 explanation = "Unexpected scenario. It's recommended to fold unless you're very confident. Consider the actions: ${actions.joinToString(", ") { "${it.first} ${it.second}" }}."

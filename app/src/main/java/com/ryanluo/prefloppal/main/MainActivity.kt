@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity() {
         actionTable.addView(row)
 
         // Pre-select appropriate action
-        if (!isSelectedPosition) {
+        if (!isSelectedPosition && position != positionDropdown.text.toString()) {
             if (position == firstRaisePosition && positionActions[position] == "raise") {
                 // If this is UTG's original row, highlight raise
                 val buttonsLayout = row.getChildAt(1) as LinearLayout
