@@ -83,7 +83,7 @@ object PokerLogic {
                     "3-bets" -> "3-bets"
                     "4-bets" -> "4-bets"
                     "calls" -> "calls"
-                    "All" -> "all in"  // Handle "All in" case
+                    "All-in" -> "All-in"  // Handle "All in" case
                     else -> continue
                 }
                 parsedActions.add(Pair(position, actionType))
@@ -103,7 +103,7 @@ object PokerLogic {
         val handKey = hand.toKey()
         val handStrength = calculateHandStrength(hand, position)
         val actions = parseActionSummary(actionSummary ?: "", tableSize)
-        val lastRaise = actions.lastOrNull { it.second in listOf("raises", "3-bets", "4-bets") }
+        val lastRaise = actions.lastOrNull { it.second in listOf("raises", "3-bets", "4-bets", "All-in") }
 
         val advice: String
         val explanation: String
@@ -275,7 +275,7 @@ object PokerLogic {
             }
 
             // Facing an all-in
-            lastRaise?.second == "all-in" -> {
+            lastRaise?.second == "All-in" -> {
                 val allInPosition = lastRaise.first
                 when {
                     setOf("AA", "KK", "AKs").contains(handKey) -> {
@@ -286,7 +286,7 @@ object PokerLogic {
                     else -> {
                         advice = "Fold"
                         explanation = "Even though ${handKey} might be a strong hand, it's not strong enough to call an all-in from $allInPosition. " +
-                                "Only the absolute premium hands (AA, KK, AKs) should continue here."
+                                "Only the absolute premium hands should continue here."
                     }
                 }
             }

@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity() {
         actionTable.addView(row)
 
         // Pre-select appropriate action
-        if (!isSelectedPosition && position != positionDropdown.text.toString()) {
+        if (!isSelectedPosition) {
             if (position == firstRaisePosition && positionActions[position] == "raise") {
                 // If this is UTG's original row, highlight raise
                 val buttonsLayout = row.getChildAt(1) as LinearLayout
@@ -612,7 +612,6 @@ class MainActivity : AppCompatActivity() {
         } else if (isDeEscalation) {
             when {
                 position == firstRaisePosition -> {
-                    println("DEBUG: Original raiser (${position}) de-escalating from ${previousAction} to ${action}")
 
                     // When original raiser de-escalates, remove ALL response rows and reset everything
                     var i = 0
@@ -641,8 +640,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 position == first3BetPosition -> {
-                    println("DEBUG: 3bettor (${position}) de-escalating from 3bet to ${action}")
-
                     // Remove any response rows that appeared after this 3bet
                     var i = 0
                     while (i < actionTable.childCount) {
@@ -839,7 +836,7 @@ class MainActivity : AppCompatActivity() {
         updateActionSummary()
     }
 
-    private fun resetPositionsAfter(position: String, newAction: String) {  // Added newAction parameter
+    private fun resetPositionsAfter(position: String, newAction: String) {
         val allPositions = when(currentTableSize) {
             "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
             else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
@@ -877,14 +874,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                // If the position that triggered the reset called, highlight call for this position
-                // Otherwise highlight fold
-                val defaultAction = if (position == posText && newAction == "call") "call" else "fold"
-
-                buttons.find { it.text.toString().lowercase() == defaultAction }?.let { buttonToHighlight ->
-                    updateButtonAppearance(buttonToHighlight, true)
-                    // Update the position actions map
-                    positionActions[posText] = defaultAction
+                // Only highlight default action if it's not the user's position
+                if (posText != positionDropdown.text.toString()) {
+                    val defaultAction = if (position == posText && newAction == "call") "call" else "fold"
+                    buttons.find { it.text.toString().lowercase() == defaultAction }?.let { buttonToHighlight ->
+                        updateButtonAppearance(buttonToHighlight, true)
+                        positionActions[posText] = defaultAction
+                    }
                 }
             }
         }
@@ -1011,7 +1007,7 @@ class MainActivity : AppCompatActivity() {
             // Add any all-ins after 4bet (from any position)
             positionActions.entries.forEach { (position, action) ->
                 if (action == "all in") {
-                    actionSequence.add("$position All in")
+                    actionSequence.add("$position All-in")
                 }
             }
         }
@@ -1076,15 +1072,20 @@ class MainActivity : AppCompatActivity() {
                 val card1 = card1TextView.text.toString()
                 val card2 = card2TextView.text.toString()
                 val position = positionDropdown.text.toString()
-
-                // Use actionSummaryText instead of converting position actions
                 val currentAction = actionSummaryText.text.toString()
-
-                // Convert table size from currentTableSize property
                 val tableSize = when(currentTableSize) {
                     "6 Players" -> TableSize.SIX_MAX
                     "9 Players" -> TableSize.NINE_MAX
-                    else -> TableSize.SIX_MAX // Default to 6 max if something goes wrong
+                    else -> TableSize.NINE_MAX
+                }
+
+                if (currentAction.isNotEmpty()) {
+                    val lastAction = currentAction.split(", ").last()
+                    val lastPosition = lastAction.split(" ")[0]  // Get first word which is the position
+                    if (lastPosition == position) {
+                        Toast.makeText(this, "There is no advice if you were the last position to act.", Toast.LENGTH_LONG).show()
+                        return@setOnClickListener
+                    }
                 }
 
                 if (position == "BB" && currentAction.isEmpty() || currentAction == "BB raises") {
