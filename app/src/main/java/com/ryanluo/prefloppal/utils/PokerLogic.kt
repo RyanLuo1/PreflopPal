@@ -149,25 +149,27 @@ object PokerLogic {
                     when {
                         threeBetRange.valueRange.contains(hand) -> {
                             advice = "3-Bet for Value"
-                            explanation = "This hand ($handKey) is strong enough to 3-bet for value against a raise from $raiserPosition when you're in $position. " +
-                                    "A value 3-bet here aims to get more chips into the pot with a hand that performs well postflop."
+                            explanation = "This hand ($handKey) is solid enough to 3-bet for value against a raise from $raiserPosition when you're in $position, " +
+                                    "aiming to build the pot with a hand that plays well postflop."
                         }
                         threeBetRange.bluffRange.contains(hand) -> {
-                            advice = "3-Bet as a Bluff or Fold"
+                            advice = "3-Bet as a Bluff"
                             explanation = "This hand ($handKey) is in the 3-bet bluffing range against a raise from $raiserPosition when you're in $position. " +
-                                    "3-bet bluffs add pressure on your opponent and also balance your own 3-betting range, but they should only be used a small percentage of the time."
+                                    "3-bet bluffs put pressure on your opponent's weaker holdings, forcing tough decisions while simultaneously balancing your 3-betting range and maintaining strategic unpredictability."
                         }
                         threeBetRange.callRange.contains(hand) -> {
                             advice = "Call"
                             explanation = "This hand ($handKey) is in the calling range against a raise from $raiserPosition when you're in $position."
                         }
                         threeBetRange.rcRange.contains(hand) -> {
-                            advice = "Mix of Raise/Call"
-                            explanation = "This hand ($handKey) is in the Raise/Call mix range against a raise from $raiserPosition when you're in $position."
+                            advice = "Raise or Call"
+                            explanation = "This hand ($handKey) can be played as a mix of Raise/Call against a raise from $raiserPosition when you're in $position." +
+                                    " Against weaker opponents, taking the more aggressive action by raising puts them under pressure and maximizes your potential to dominate the hand. However, against stronger opponents, opting to call is often safer to avoid difficult post-flop confrontations."
                         }
                         threeBetRange.fcRange.contains(hand) -> {
-                            advice = "Mix of Fold/Call"
-                            explanation = "This hand ($handKey) is in the Fold/Call mix range against a raise from $raiserPosition when you're in $position."
+                            advice = "Call or Fold"
+                            explanation = "This hand ($handKey) is in the Call/Fold mix range against a raise from $raiserPosition when you're in $position. Calling allows you to see the flop with a potentially high-equity hand, giving you the opportunity to leverage your post-flop skills." +
+                                    " However, folding is also acceptable, especially against strong opponents."
                         }
                         else -> {
                             advice = "Fold"
@@ -193,9 +195,9 @@ object PokerLogic {
                                     "A value 4-bet aims to maximize the potential of your strong hand by building a larger pot, especially when you expect weaker hands to continue or call."
                         }
                         facingThreeBetRange.fourBetBluffRange.contains(hand) -> {
-                            advice = "4-Bet as a Bluff or Fold"
+                            advice = "4-Bet as a Bluff"
                             explanation = "This hand ($handKey) can be used as a 4-bet bluff against a 3-bet from $threeBetPosition when you're in $position. " +
-                                    "Bluffing with a 4-bet adds pressure on your opponent, often forcing folds from marginal hands. Using these bluffs also helps balance your overall range, " +
+                                    "4-bet bluffing adds pressure on your opponent, often forcing folds from marginal hands. Using these bluffs also helps balance your overall range, " +
                                     "making it harder for opponents to read your hand strength in similar situations."
                         }
                         facingThreeBetRange.callRange.contains(hand) -> {
@@ -205,7 +207,8 @@ object PokerLogic {
                         }
                         facingThreeBetRange.rcRange.contains(hand) -> {
                             advice = "Raise or Call"
-                            explanation = "This hand ($handKey) is solid enough to Raise/call mix against a 3-bet from $threeBetPosition when you're in $position."
+                            explanation = "This hand ($handKey) is solid enough to play as a Raise/call mix against a 3-bet from $threeBetPosition when you're in $position." +
+                                    " Against weaker opponents, taking the more aggressive action by raising puts them under pressure and maximizes your potential to dominate the hand. However, against stronger opponents, opting to call is often safer to avoid difficult post-flop confrontations."
                         }
                         else -> {
                             advice = "Fold"
@@ -233,8 +236,8 @@ object PokerLogic {
                     when {
                         facingFourBetRange.allInRange.contains(hand) -> {
                             advice = "All-In"
-                            explanation = "As the 3-bettor, your hand ($handKey) is strong enough to move all-in against a 4-bet from $fourBetPosition. " +
-                                    "Since you 3-bet this hand for value, you can continue with a 5-bet all-in."
+                            explanation = "As the 3-bettor, your hand ($handKey) is strong enough to move all-in against a 4-bet from $fourBetPosition." +
+                                    " This hand has sufficient equity and value to warrant a 5-bet shove, applying maximum pressure and denying equity from your opponent to potentially win a large pot."
                         }
                         facingFourBetRange.callRange.contains(hand) -> {
                             advice = "Call"
@@ -242,7 +245,7 @@ object PokerLogic {
                                     "While not strong enough to move all-in, it has good playability and equity to continue."
                         }
                         facingFourBetRange.bluffRange.contains(hand) -> {
-                            advice = "All-In as a Bluff or Fold"
+                            advice = "All-In as a Bluff"
                             explanation = "As the 3-bettor, this hand ($handKey) can be used as an all-in bluff against a 4-bet from $fourBetPosition. " +
                                     "While risky, occasionally moving all-in with these hands helps balance your range and prevents opponents from exploiting you."
                         }
@@ -257,8 +260,8 @@ object PokerLogic {
                     when {
                         setOf("AA", "KK", "AKs").contains(handKey) -> {
                             advice = "All-In"
-                            explanation = "Facing a cold 4-bet from $fourBetPosition, only the absolute strongest hands ($handKey) can move all-in. " +
-                                    "Your hand is at the top of your range and performs well enough against both the original 3-bettor and the 4-bettor."
+                            explanation = "Facing a cold 4-bet from $fourBetPosition, only the absolute strongest hands can move all-in. " +
+                                    "Your hand ($handKey) is at the top of your range and performs well enough against both the original 3-bettor and the 4-bettor."
                         }
                         handKey == "QQ" -> {
                             advice = "Call"
@@ -285,7 +288,7 @@ object PokerLogic {
                     }
                     else -> {
                         advice = "Fold"
-                        explanation = "Even though ${handKey} might be a strong hand, it's not strong enough to call an all-in from $allInPosition. " +
+                        explanation = "${handKey} is not strong enough to call an all-in from $allInPosition. " +
                                 "Only the absolute premium hands should continue here."
                     }
                 }

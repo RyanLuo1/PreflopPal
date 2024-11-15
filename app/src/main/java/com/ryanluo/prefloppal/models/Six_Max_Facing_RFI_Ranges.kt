@@ -5,29 +5,32 @@ import com.ryanluo.prefloppal.utils.Range
 object Six_Max_RFIThreeBetRanges {
 
     val RANGES = mapOf(
+
+        //UTG can't face RFI
+
         "MP" to mapOf(
             "UTG" to RFIThreeBetRange(
                 callRange = Range(setOf( )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "KK", "QQ", "AKs", "AKo")),
-                bluffRange = Range(setOf("A5s", "A4s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "KK", "KQs", "KJs", "KTs", "QQ", "QJs", "JJ", "TT", "99")),
+                bluffRange = Range(setOf("A5s", "A4s",))
             )
         ),
         "CO" to mapOf(
             "UTG" to RFIThreeBetRange(
                 callRange = Range(setOf( )),
-                rcRange = Range(setOf( )),
+                rcRange = Range(setOf("99", "88", "77")),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "KK", "QQ", "AKs", "AKo", "AQs")),
-                bluffRange = Range(setOf("AQo", "AJo", "A5s", "A4s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "KK", "KQs", "KJs", "KTs", "QQ", "QJs", "QTs", "JJ", "TT")),
+                bluffRange = Range(setOf( "A5s", "A4s","KQo"))
             ),
             "MP" to RFIThreeBetRange(
                 callRange = Range(setOf( )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "KK", "QQ", "AKs", "AKo")),
-                bluffRange = Range(setOf("A4s", "A3s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "KK", "KQs", "KJs", "KTs", "QQ", "QJs", "QTs", "JJ", "JTs", "TT", "99", "88", "77")),
+                bluffRange = Range(setOf("AJo", "A9s", "A5s", "A4s", "A3s","KQo", "K9s"))
             )
         ),
         "BTN" to mapOf(

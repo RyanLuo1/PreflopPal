@@ -212,31 +212,30 @@ class HistoryActivity : AppCompatActivity() {
     }
 
 
+    // HistoryActivity (Left Screen)
     private fun setupBottomNavigation() {
-        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+        findViewById<BottomNavigationView>(R.id.bottomNavigation).apply {
+            selectedItemId = R.id.navigation_history
 
-        // Set the History item as selected
-        bottomNavigation.selectedItemId = R.id.navigation_history
-
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when(item.itemId) {
-                R.id.navigation_home -> {
-                    // Go back to MainActivity
-                    startActivity(Intent(this, MainActivity::class.java))
-                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
-                    finish()
-                    true
+            setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.navigation_history -> {
+                        true // Already here
+                    }
+                    R.id.navigation_home -> {
+                        startActivity(Intent(this@HistoryActivity, MainActivity::class.java))
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                        finish()
+                        true
+                    }
+                    R.id.navigation_learn -> {
+                        startActivity(Intent(this@HistoryActivity, LearnActivity::class.java))
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                        finish()
+                        true
+                    }
+                    else -> false
                 }
-                R.id.navigation_learn -> {
-                    startActivity(Intent(this, LearnActivity::class.java))
-                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
-                    true
-                }
-                R.id.navigation_history -> {
-                    // Already on history screen
-                    true
-                }
-                else -> false
             }
         }
     }

@@ -116,12 +116,19 @@ class LearnActivity : AppCompatActivity() {
     }
 
 
+    // LearnActivity (Right Screen)
     private fun setupBottomNavigation() {
         findViewById<BottomNavigationView>(R.id.bottomNavigation).apply {
             selectedItemId = R.id.navigation_learn
 
             setOnItemSelectedListener { item ->
                 when (item.itemId) {
+                    R.id.navigation_history -> {
+                        startActivity(Intent(this@LearnActivity, HistoryActivity::class.java))
+                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+                        finish()
+                        true
+                    }
                     R.id.navigation_home -> {
                         startActivity(Intent(this@LearnActivity, MainActivity::class.java))
                         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
@@ -129,14 +136,7 @@ class LearnActivity : AppCompatActivity() {
                         true
                     }
                     R.id.navigation_learn -> {
-                        startActivity(Intent(this@LearnActivity, LearnActivity::class.java))
-                        finish()
-                        true
-                    } // Already here
-                    R.id.navigation_history -> {
-                        startActivity(Intent(this@LearnActivity, HistoryActivity::class.java))
-                        finish()
-                        true
+                        true // Already here
                     }
                     else -> false
                 }

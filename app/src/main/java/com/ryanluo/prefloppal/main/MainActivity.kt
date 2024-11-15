@@ -551,6 +551,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleActionClick(clickedButton: MaterialButton, position: String, action: String) {
 
+        val allPositions = when(currentTableSize) {
+            "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
+            else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
+        }
+
         // Get parent layout and all buttons
         val buttonsLayout = clickedButton.parent as LinearLayout
         val buttons = (0 until buttonsLayout.childCount)
@@ -582,11 +587,6 @@ class MainActivity : AppCompatActivity() {
             previousAction == "raise" && (action == "3bet" || action == "4bet") -> true
             previousAction == "3bet" && action == "4bet" -> true
             else -> false
-        }
-
-        val allPositions = when(currentTableSize) {
-            "9 Players" -> listOf("UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB")
-            else -> listOf("UTG", "MP", "CO", "BTN", "SB", "BB")
         }
 
         // Check if this is the user's selected position
@@ -1155,24 +1155,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
-        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottomNavigation)
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when(item.itemId) {
-                R.id.navigation_home -> {
-                    // Already on home screen
-                    true
+        findViewById<BottomNavigationView>(R.id.bottomNavigation).apply {
+            selectedItemId = R.id.navigation_home
+
+            setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.navigation_history -> {
+                        startActivity(Intent(this@MainActivity, HistoryActivity::class.java))
+                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+                        finish()
+                        true
+                    }
+                    R.id.navigation_home -> {
+                        true // Already here
+                    }
+                    R.id.navigation_learn -> {
+                        startActivity(Intent(this@MainActivity, LearnActivity::class.java))
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                        finish()
+                        true
+                    }
+                    else -> false
                 }
-                R.id.navigation_learn -> {
-                    // Handle learn navigation
-                    startActivity(Intent(this, LearnActivity::class.java))
-                    true
-                }
-                R.id.navigation_history -> {
-                    // Handle history navigation
-                    startActivity(Intent(this, HistoryActivity::class.java))
-                    true
-                }
-                else -> false
             }
         }
     }

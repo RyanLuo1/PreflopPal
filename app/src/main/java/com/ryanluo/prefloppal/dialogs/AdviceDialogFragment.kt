@@ -39,13 +39,28 @@ class AdviceDialogFragment : DialogFragment() {
 
     private fun getColorForAdvice(advice: String): Int {
         val colorRes = when {
+            // 4-bet situations
             advice.contains("4-Bet for Value", ignoreCase = true) -> R.color.green
-            advice.contains("4-Bet as a Bluff or Fold", ignoreCase = true) -> R.color.orange
+            advice.contains("4-Bet as a Bluff", ignoreCase = true) -> R.color.orange
+
+            // 3-bet situations
             advice.contains("3-Bet for Value", ignoreCase = true) -> R.color.green
-            advice.contains("3-Bet as a Bluff or Fold", ignoreCase = true) -> R.color.orange
-            advice.contains("raise", ignoreCase = true) -> R.color.green_500
-            advice.contains("call", ignoreCase = true) -> R.color.blue_500
-            advice.contains("fold", ignoreCase = true) -> R.color.red
+            advice.contains("3-Bet as a Bluff", ignoreCase = true) -> R.color.orange
+
+            // All-in situations
+            advice.contains("All-In", ignoreCase = true) -> R.color.green
+            advice.contains("All-In as a Bluff", ignoreCase = true) -> R.color.orange
+
+            // Mixed strategies
+            advice.contains("Raise or Call", ignoreCase = true) -> R.color.blue_500
+            advice.contains("Call or Fold", ignoreCase = true) -> R.color.blue_500
+
+            // Basic actions
+            advice.contains("Raise", ignoreCase = true) -> R.color.green_500
+            advice.contains("Call", ignoreCase = true) -> R.color.blue_500
+            advice.contains("Fold", ignoreCase = true) -> R.color.red
+
+            // Default case
             else -> android.R.color.white
         }
         return ContextCompat.getColor(requireContext(), colorRes)
