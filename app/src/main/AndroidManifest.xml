@@ -45,6 +45,10 @@
             android:name=".main.HistoryActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".main.PracticeModeActivity"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

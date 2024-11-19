@@ -1,7 +1,11 @@
 package com.ryanluo.prefloppal.main
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -11,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import com.ryanluo.prefloppal.R
 import com.ryanluo.prefloppal.adapters.FaqAdapter
 import com.ryanluo.prefloppal.adapters.TermAdapter
@@ -19,21 +24,82 @@ import com.ryanluo.prefloppal.data.getTermItems
 
 class LearnActivity : AppCompatActivity() {
 
-    private val faqItems = getFaqItems();
-    private val termItems = getTermItems();
+    private val faqItems = getFaqItems()
+    private val termItems = getTermItems()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.learn_activity)
 
+        setupWelcomeText()
+        setupPracticeButton()
+
         setupMenuIcon()
         setupBottomNavigation()
-        // Welcome content is visible by default in the layout
+        setupBackButton()
+
+        // Show practice content by default
+        findViewById<View>(R.id.practiceContent).visibility = View.VISIBLE
     }
+
+    private fun setupWelcomeText() {
+        val welcomeText = findViewById<TextView>(R.id.welcomeText)
+        val text = SpannableStringBuilder(
+            "Welcome to the Preflop Practice Mode—your comprehensive tool for mastering poker strategy from the very first action. This interactive section is designed to help you practice real-world preflop scenarios, sharpen your decision-making skills, and deepen your understanding of preflop ranges and strategies. Whether you're a beginner looking to learn the fundamentals or an experienced player refining your edge, this tool offers a dynamic way to practice and improve.\n\n" +
+                    "In addition to the practice mode, we've included an FAQ page to answer common questions and a Terminology page to familiarize you with essential poker terms. These resources ensure you have the support and knowledge needed to confidently navigate and enhance your preflop game.\n\n" +
+                    "Dive in, explore, and start your journey to becoming a more skilled and strategic poker player!"
+        )
+
+        // Make "Preflop Practice Mode" bold
+        text.setSpan(
+            StyleSpan(Typeface.BOLD),
+            "Welcome to the ".length,
+            "Welcome to the Preflop Practice Mode".length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        // Make "FAQ page" bold
+        text.setSpan(
+            StyleSpan(Typeface.BOLD),
+            text.indexOf("FAQ page"),
+            text.indexOf("FAQ page") + "FAQ page".length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        // Make "Terminology page" bold
+        text.setSpan(
+            StyleSpan(Typeface.BOLD),
+            text.indexOf("Terminology page"),
+            text.indexOf("Terminology page") + "Terminology page".length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        welcomeText.text = text
+    }
+
+    private fun setupPracticeButton() {
+        // Make sure the ID matches the one in your XML
+        findViewById<MaterialButton>(R.id.enterPracticeButton).setOnClickListener {
+            // Start the PracticeModeActivity
+            val intent = Intent(this, PracticeModeActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+
+
+
+
 
     private fun setupMenuIcon() {
         findViewById<ImageView>(R.id.menuIcon).setOnClickListener { view ->
             showPopupMenu(view)
+        }
+    }
+
+    private fun setupBackButton() {
+        findViewById<ImageView>(R.id.backButton).setOnClickListener {
+            showContent(ContentType.PRACTICE)
         }
     }
 
@@ -50,10 +116,6 @@ class LearnActivity : AppCompatActivity() {
                         showContent(ContentType.TERMINOLOGY)
                         true
                     }
-                    R.id.menu_practice -> {
-                        showContent(ContentType.PRACTICE)
-                        true
-                    }
                     else -> false
                 }
             }
@@ -62,32 +124,38 @@ class LearnActivity : AppCompatActivity() {
     }
 
     private enum class ContentType {
-         FAQ, TERMINOLOGY, PRACTICE
+        FAQ, TERMINOLOGY, PRACTICE
     }
 
     private fun showContent(contentType: ContentType) {
         // Hide all content first
-
         findViewById<View>(R.id.faqContent).visibility = View.GONE
         findViewById<View>(R.id.terminologyContent).visibility = View.GONE
         findViewById<View>(R.id.practiceContent).visibility = View.GONE
 
+        // Get toolbar elements
+        val toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
+        val backButton = findViewById<ImageView>(R.id.backButton)
+
         // Show selected content
         when (contentType) {
-
             ContentType.FAQ -> {
-                findViewById<TextView>(R.id.toolbarTitle).text = "Frequently Asked Questions"
+                toolbarTitle.text = "Frequently Asked Questions"
+                backButton.visibility = View.VISIBLE
                 val faqContent = findViewById<View>(R.id.faqContent)
                 faqContent.visibility = View.VISIBLE
                 setupFaqRecyclerView()
             }
             ContentType.TERMINOLOGY -> {
-                findViewById<TextView>(R.id.toolbarTitle).text = "Common Poker Terms"
+                toolbarTitle.text = "Common Poker Terms"
+                backButton.visibility = View.VISIBLE
                 val termContent = findViewById<View>(R.id.terminologyContent)
                 termContent.visibility = View.VISIBLE
                 setupTermRecyclerView()
             }
             ContentType.PRACTICE -> {
+                toolbarTitle.text = "Learn Poker Basics!"
+                backButton.visibility = View.GONE
                 findViewById<View>(R.id.practiceContent).visibility = View.VISIBLE
             }
         }
@@ -115,8 +183,6 @@ class LearnActivity : AppCompatActivity() {
         }
     }
 
-
-    // LearnActivity (Right Screen)
     private fun setupBottomNavigation() {
         findViewById<BottomNavigationView>(R.id.bottomNavigation).apply {
             selectedItemId = R.id.navigation_learn
