@@ -13,8 +13,8 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("JJ", "TT")),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "A5s", "KK", "KQs", "KJs", "KTs", "QQ")),
-                bluffRange = Range(setOf("AJs", "ATs", "A8s", "A7s", "A4s", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "KK", "KQs", "QQ")),
+                bluffRange = Range(setOf("AJs", "ATs", "A8s", "A7s","A5s","A4s","KJs","KTs","K5s"))
             )
         ),
         "UTG+2" to mapOf(
@@ -22,15 +22,15 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("JJ", "TT" )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ")),
-                bluffRange = Range(setOf("ATs", "A8s", "A7s", "A4s", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ")),
+                bluffRange = Range(setOf("ATs", "A8s", "A7s", "A5s", "A4s","KJs", "KTs","K5s"))
             ),
             "UTG+1" to RFIThreeBetRange(
                 callRange = Range(setOf("JJ", "TT" )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "A5s", "KK", "KQs", "KJs", "KTs", "QQ")),
-                bluffRange = Range(setOf("AQo", "ATs", "A4s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ")),
+                bluffRange = Range(setOf("AQo", "ATs", "A5s", "A4s", "KJs", "KTs",))
             )
         ),
         "LJ" to mapOf(
@@ -38,22 +38,22 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("JJ", "TT")),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs","A5s", "KK", "KQs", "KJs", "KTs", "QQ")),
-                bluffRange = Range(setOf("ATs", "A8s", "A7s", "A4s", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ")),
+                bluffRange = Range(setOf("ATs", "A8s", "A7s","A5s", "A4s","KJs", "KTs", "K5s"))
             ),
             "UTG+1" to RFIThreeBetRange(
                 callRange = Range(setOf("JJ", "TT" )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ")),
-                bluffRange = Range(setOf("AQo", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ")),
+                bluffRange = Range(setOf("AQo","ATs", "A5s", "A4s", "KJs", "KTs", "K5s"))
             ),
             "UTG+2" to RFIThreeBetRange(
                 callRange = Range(setOf("99")),
                 rcRange = Range(setOf("TT" )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ", "JJ")),
-                bluffRange = Range(setOf("KQo", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs","KK", "KQs", "QQ", "JJ")),
+                bluffRange = Range(setOf("AQo", "ATs", "A5s", "A4s", "KQo", "KJs", "KTs", "K5s"))
             )
         ),
         "HJ" to mapOf(
@@ -61,29 +61,29 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("JJ", "TT")),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ")),
-                bluffRange = Range(setOf("AQo", "A8s", "A7s", "K6s", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ")),
+                bluffRange = Range(setOf("AQo", "ATs", "A5s", "A4s", "A8s", "A7s", "KJs", "KTs", "K6s", "K5s"))
             ),
             "UTG+1" to RFIThreeBetRange(
                 callRange = Range(setOf("TT" )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ", "JJ")),
-                bluffRange = Range(setOf("AQo", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ", "JJ")),
+                bluffRange = Range(setOf("AQo","ATs", "A5s", "A4s", "KJs", "KTs", "K5s"))
             ),
             "UTG+2" to RFIThreeBetRange(
                 callRange = Range(setOf("TT")),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ", "JJ")),
-                bluffRange = Range(setOf("KQo", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ", "JJ")),
+                bluffRange = Range(setOf("AQo","ATs", "A5s", "A4s", "KQo", "KJs", "KTs", "K5s"))
             ),
             "LJ" to RFIThreeBetRange(
                 callRange = Range(setOf( )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KQo", "KJs", "KTs", "QQ", "JJ", "TT")),
-                bluffRange = Range(setOf("A3s", "99"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AJs", "KK", "KQs", "QQ", "JJ", "TT")),
+                bluffRange = Range(setOf("AQo", "ATs", "A5s", "A4s", "A3s","KQo", "KJs", "KTs","99"))
             )
         ),
         "CO" to mapOf(
@@ -91,22 +91,22 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf( )),
                 rcRange = Range(setOf("JJ", "TT" )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ")),
-                bluffRange = Range(setOf("A7s", "K6s", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "KK", "KQs", "QQ")),
+                bluffRange = Range(setOf("ATs","A7s", "A5s", "A4s", "KJs", "KTs", "K6s", "K5s"))
             ),
             "UTG+1" to RFIThreeBetRange(
                 callRange = Range(setOf("TT")),
                 rcRange = Range(setOf()),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ", "JJ")),
-                bluffRange = Range(setOf("AQo", "AJs", "A3s", "K5s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs",  "KK", "KQs", "QQ", "JJ")),
+                bluffRange = Range(setOf("AQo", "AJs", "ATs", "A5s", "A4s", "A3s", "KJs", "KTs", "K5s"))
             ),
             "UTG+2" to RFIThreeBetRange(
                 callRange = Range(setOf("TT")),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KJs", "KTs", "QQ", "JJ")),
-                bluffRange = Range(setOf("KQo", "K5s", "65s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "KK", "KQs", "QQ", "JJ")),
+                bluffRange = Range(setOf("AQo", "AJs", "ATs", "A5s", "A4s", "KQo", "KJs", "KTs", "K5s", "65s"))
             ),
             "LJ" to RFIThreeBetRange(
                 callRange = Range(setOf("99", "88","77" )),
@@ -119,8 +119,8 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("99", "88", "77", "66")),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "AJo", "ATs", "A9s", "A5s", "A4s", "A3s", "KK", "KQs", "KQo", "KJs", "KTs", "QQ", "QJs", "QTs", "JJ", "TT")),
-                bluffRange = Range(setOf("A8s", "A7s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "KK", "KQs", "KQo", "KJs", "QQ", "QJs", "JJ", "TT")),
+                bluffRange = Range(setOf("AJo", "ATs", "A9s", "A8s", "A7s", "A5s", "A4s", "A3s","KTs","QTs"))
             )
         ),
         "BTN" to mapOf(
@@ -149,22 +149,22 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("99", "88", "77" )),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "ATs", "A5s", "A4s", "KK", "KQs", "KQo", "KJs", "KTs", "QQ", "JJ", "TT")),
-                bluffRange = Range(setOf("AJo"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "KK", "KQs", "KQo", "KJs", "QQ", "JJ", "TT")),
+                bluffRange = Range(setOf("AJo", "ATs", "A5s", "A4s","KTs"))
             ),
             "HJ" to RFIThreeBetRange(
                 callRange = Range(setOf("99", "88", "77")),
                 rcRange = Range(setOf( )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "AJo", "ATs", "A9s", "A5s", "A4s", "A3s", "KK", "KQs", "KQo", "KJs", "KTs", "QQ", "QJs", "QTs", "JJ", "TT")),
-                bluffRange = Range(setOf("A8s", "A7s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "KK", "KQs", "KQo", "KJs", "QQ", "QJs","JJ", "TT")),
+                bluffRange = Range(setOf("AJo", "ATs", "A9s", "A8s", "A7s", "A5s", "A4s", "A3s","KTs", "QTs"))
             ),
             "CO" to RFIThreeBetRange(
                 callRange = Range(setOf("ATs", "77")),
                 rcRange = Range(setOf("AJs", "KJs", "KTs", "QJs", "QTs", "JTs", "TT", "99", "88" )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJo", "ATo", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "KK", "KQo", "KJo", "K9s", "QQ", "JJ")),
-                bluffRange = Range(setOf("K6s", "Q9s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo",  "KK", "KQo", "QQ", "JJ")),
+                bluffRange = Range(setOf("AJo", "ATo", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s","KJo", "K9s","K6s", "Q9s"))
             )
         ),
         "SB" to mapOf(
@@ -186,29 +186,29 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("AQs", "AJs", "ATs", "JJ", "JTs", "TT", "99", "88", "77", "66" )),
                 rcRange = Range(setOf("AQo", "A5s", "A3s", "KQs", "KJs", "KTs", "QQ", "QJs")),
                 fcRange = Range(setOf("A9s","QTs")),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "A4s", "KK")),
-                bluffRange = Range(setOf("K6s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "KK")),
+                bluffRange = Range(setOf("A4s", "K6s"))
             ),
             "LJ" to RFIThreeBetRange(
                 callRange = Range(setOf("AJs", "ATs", "A9s", "99", "88", "77", "66", "55" )),
                 rcRange = Range(setOf("AQo", "A5s", "QJs", "JJ", "JTs", "TT" )),
                 fcRange = Range(setOf("44", "33", "22" )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "A4s", "A3s", "KK", "KTs", "QQ")),
-                bluffRange = Range(setOf("KQo"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "KK", "QQ")),
+                bluffRange = Range(setOf("A4s", "A3s", "KQo", "KTs"))
             ),
             "HJ" to RFIThreeBetRange(
                 callRange = Range(setOf("AJs", "ATs", "A9s", "A8s", "KQs", "KJs", "KTs", "TT", "99", "88", "77", "66", "55" )),
                 rcRange = Range(setOf("AJo", "A5s", "QJs", "QTs" )),
                 fcRange = Range(setOf("44", "33")),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "A4s","A3s", "KK", "KQo", "QQ")),
-                bluffRange = Range(setOf("K6s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "KK", "KQo", "QQ")),
+                bluffRange = Range(setOf("A4s","A3s", "K6s"))
             ),
             "CO" to RFIThreeBetRange(
                 callRange = Range(setOf("88", "77" )),
                 rcRange = Range(setOf("AJs", "ATs", "KQs", "KJs", "99" )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJo", "A9s", "A5s", "A4s", "A3s", "KK", "KQo", "KJo", "KTs", "QQ", "QJs", "QTs", "JJ", "JTs", "TT")),
-                bluffRange = Range(setOf("K9s"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "KK", "KQo", "QQ", "QJs", "JJ", "TT")),
+                bluffRange = Range(setOf("AJo", "A9s", "A5s", "A4s", "A3s","KJo", "KTs", "K9s", "QTs", "JTs"))
             ),
             "BTN" to RFIThreeBetRange(
                 callRange = Range(setOf( )),
@@ -265,15 +265,15 @@ object Nine_Max_RFIThreeBetRanges {
                 callRange = Range(setOf("AJo", "ATs", "ATo", "A9s", "A9o", "A8s", "A8o", "A7s", "A6s", "A4s", "A3s", "A2s", "KQo", "KJs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s", "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "JTo", "J9s", "J8s", "J7s", "J6s", "J5s", "J4s", "T9o", "T8s", "T7s", "T6s", "98s", "97s", "96s", "88", "87s", "86s", "85s", "77", "76s", "75s", "74s", "66", "65s", "64s", "55", "54s", "53s", "44", "43s", "33", "22" )),
                 rcRange = Range(setOf("A7o","A5o", "KJo", "KTs", "KTo", "K9o", "QJo", "QTo", "Q3s", "Q2s", "JTs", "99" )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "A5s", "KK", "KQs", "QQ", "JJ", "TT", "T9s")),
-                bluffRange = Range(setOf())
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "KK", "KQs", "QQ", "JJ", "TT")),
+                bluffRange = Range(setOf("A5s", "T9s"))
             ),
             "SB" to RFIThreeBetRange(
                 callRange = Range(setOf("AJo", "ATs", "ATo", "A9s", "A9o", "A8s", "A8o", "A7s", "A7o", "A6s", "A5o", "A3s", "A2s", "KQo", "KJo", "KTo", "K9o", "K8s", "K8o", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s", "QJo", "QTs", "QTo", "Q9s", "Q9o", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "Q2s", "JTo", "J9s", "J9o", "J8s", "J7s", "J6s", "J5s", "J4s", "J3s", "T9o", "T8s", "T7s", "T6s", "98o", "97s", "96s", "95s", "88", "86s", "85s", "77", "75s", "74s", "66", "64s", "63s", "55", "53s", "52s", "44", "43s", "42s", "33", "32s", "22" )),
                 rcRange = Range(setOf("A6o", "A3o", "KTs", "K9s", "JTs", "J2s", "T9s", "99", "87s", "76s", "54s" )),
                 fcRange = Range(setOf( )),
-                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "A5s", "A4s", "A3o", "A2o", "KK", "KQs", "KJs", "QQ", "QJs", "JJ", "TT", "T3s", "T2s", "98s")),
-                bluffRange = Range(setOf("Q8o", "J8o"))
+                valueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "A5s", "A4s", "KK", "KQs", "KJs", "QQ", "QJs", "JJ", "TT")),
+                bluffRange = Range(setOf("A3o", "A2o", "Q8o", "J8o", "T3s", "T2s", "98s"))
             )
         )
     )

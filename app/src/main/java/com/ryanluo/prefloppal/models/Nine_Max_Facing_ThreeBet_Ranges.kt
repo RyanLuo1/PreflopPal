@@ -216,14 +216,14 @@ object Nine_Max_FacingThreeBetRanges {
                 "CO" to FacingThreeBetRange(
                     callRange = Range(setOf("AQs")),
                     rcRange = Range(setOf("AJs", "ATs", "KQs", "KTs" )),
-                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQo", "KK", "KJs", "QQ", "JJ", "TT")),
-                    fourBetBluffRange = Range(setOf())
+                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "KK", "QQ", "JJ", "TT")),
+                    fourBetBluffRange = Range(setOf("AQo", "KJs"))
                 ),
                 "BTN" to FacingThreeBetRange(
                     callRange = Range(setOf("AQs")),
                     rcRange = Range(setOf("AJs", "ATs", "KQs")),
-                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQo", "KK", "KJs", "KTs", "QQ", "JJ", "TT")),
-                    fourBetBluffRange = Range(setOf())
+                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "KK", "QQ", "JJ", "TT")),
+                    fourBetBluffRange = Range(setOf("AQo","KJs", "KTs"))
                 ),
                 "SB" to FacingThreeBetRange(
                     callRange = Range(setOf("AQs", "AJs", "ATs", "KQs", "QQ", "JJ", "TT", "99")),
@@ -267,8 +267,8 @@ object Nine_Max_FacingThreeBetRanges {
                 "BTN" to FacingThreeBetRange(
                     callRange = Range(setOf("AQs", "AJs", "KQs")),
                     rcRange = Range(setOf("ATs", "A5s", "TT", "99")),
-                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQo", "KK", "KJs", "KTs", "QQ", "JJ")),
-                    fourBetBluffRange = Range(setOf("AJo", "K9s", "JTs"))
+                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "KK", "QQ", "JJ")),
+                    fourBetBluffRange = Range(setOf("AQo", "AJo", "KJs", "KTs", "K9s", "JTs"))
                 ),
                 "SB" to FacingThreeBetRange(
                     callRange = Range(setOf("AQs", "AJs", "KQs")),
@@ -279,8 +279,8 @@ object Nine_Max_FacingThreeBetRanges {
                 "BB" to FacingThreeBetRange(
                     callRange = Range(setOf("AQs", "AJs", "ATs", "A5s", "KQs", "KJs", "TT", "99", "88")),
                     rcRange = Range(setOf("JJ")),
-                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQo", "KK", "QQ")),
-                    fourBetBluffRange = Range(setOf("A8s", "KJo"))
+                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "KK", "QQ")),
+                    fourBetBluffRange = Range(setOf("AQo", "A8s", "KJo"))
                 )
             ),
             "BTN" to mapOf(
@@ -318,8 +318,8 @@ object Nine_Max_FacingThreeBetRanges {
                 "SB" to FacingThreeBetRange(
                     callRange = Range(setOf()),
                     rcRange = Range(setOf( )),
-                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJs", "KK", "KQs", "KJs", "QQ", "JJ", "TT")),
-                    fourBetBluffRange = Range(setOf("ATs", "KTs", "99"))
+                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "KK", "QQ", "JJ", "TT")),
+                    fourBetBluffRange = Range(setOf("AQo", "AJs", "ATs","KQs", "KJs", "KTs", "99"))
                 ),
                 "BB" to FacingThreeBetRange(
                     callRange = Range(setOf("AJs", "ATs", "A5s", "KQs", "KJs", "KTs", "QJs", "QTs", "JTs", "99", "88", "77", "66")),
@@ -369,8 +369,8 @@ object Nine_Max_FacingThreeBetRanges {
                 "BB" to FacingThreeBetRange(
                     callRange = Range(setOf("AJs", "ATs", "A9s", "KQs", "KJs", "KTs", "QJs", "JTs", "99", "88", "77", "66")),
                     rcRange = Range(setOf("A7s", "A6s", "A5s", "K9s", "Q9s", "J9s", "T9s")),
-                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "AQo", "AJo", "A4s", "A3s", "KK", "KQo", "QQ", "JJ", "TT")),
-                    fourBetBluffRange = Range(setOf("ATo", "K5s"))
+                    fourBetValueRange = Range(setOf("AA", "AKs", "AKo", "AQs", "KK", "QQ", "JJ", "TT")),
+                    fourBetBluffRange = Range(setOf("AQo", "AJo", "ATo", "A4s", "A3s", "KQo", "K5s"))
                 )
             ),
         "BB" to mapOf(

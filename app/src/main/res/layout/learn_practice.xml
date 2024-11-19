@@ -32,8 +32,8 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textColor="@color/dark_purple"
-                    android:lineSpacingExtra="8dp"
-                    android:text="Welcome to the Preflop Practice Mode—your comprehensive tool for mastering poker strategy from the very first action. This interactive section is designed to help you practice real-world preflop scenarios, sharpen your decision-making skills, and deepen your understanding of preflop ranges and strategies. Whether you're a beginner looking to learn the fundamentals or an experienced player refining your edge, this tool offers a dynamic way to practice and improve.\n\nIn addition to the practice mode, we've included an FAQ page to answer common questions and a Terminology page to familiarize you with essential poker terms. These resources ensure you have the support and knowledge needed to confidently navigate and enhance your preflop game.\n\nDive in, explore, and start your journey to becoming a more skilled and strategic poker player!"/>
+                    android:lineSpacingExtra="4dp"
+                    android:text="Welcome to the Preflop Practice Mode\n  This comprehensive tool will help you master poker strategy from the very first action. This interactive section is designed to help simulate real-world preflop scenarios and sharpen your decision-making skills. Whether you're a beginner looking to learn the fundamentals or an experienced player refining your edge, this tool offers a dynamic way to practice and improve.\nIn addition to the practice mode, we've included an FAQ page to answer common questions and Terminology page to familiarize you with essential poker terms. These resources ensure you have the support and knowledge needed to confidently navigate and enhance your poker game.\nDive in, explore, and start your journey to becoming a more skilled and strategic poker player!"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

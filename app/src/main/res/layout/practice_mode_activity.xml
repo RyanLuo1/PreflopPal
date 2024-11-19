@@ -103,7 +103,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/card_background"
                             android:gravity="center"
-                            android:text="K♥"
+                            android:text="K♠"
                             android:textColor="@color/black"
                             android:textSize="36sp"
                             android:clickable="true"
@@ -135,24 +135,25 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="12dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:text="Current Action"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textColor="@color/dark_purple"
                         android:textStyle="bold"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginBottom="4dp"/>
 
                     <TextView
                         android:id="@+id/actionText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="UTG raises to 3BB\nCO 3-bets to 9BB\nAction on you"
-                        android:lineSpacingExtra="8dp"
-                        android:textSize="18sp"
+                        android:lineSpacingExtra="4dp"
+                        android:textSize="16sp"
                         android:textColor="@color/dark_purple"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -161,6 +162,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:text="What would you do?"
                 android:textSize="20sp"
                 android:textColor="@color/dark_purple"

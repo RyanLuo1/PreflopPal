@@ -153,9 +153,10 @@ object PokerLogic {
                                     "aiming to build the pot with a hand that plays well postflop."
                         }
                         threeBetRange.bluffRange.contains(hand) -> {
-                            advice = "3-Bet as a Bluff"
+                            advice = "3-Bet Bluff or Fold"
                             explanation = "This hand ($handKey) is in the 3-bet bluffing range against a raise from $raiserPosition when you're in $position. " +
-                                    "3-bet bluffs put pressure on your opponent's weaker holdings, forcing tough decisions while simultaneously balancing your 3-betting range and maintaining strategic unpredictability."
+                                    "3-bet bluffs put pressure on your opponent's weaker holdings, forcing tough decisions while simultaneously balancing your 3-betting range and maintaining strategic unpredictability." +
+                                    " However, if you feel your opponent is a balanced or strong player, folding is better here."
                         }
                         threeBetRange.callRange.contains(hand) -> {
                             advice = "Call"
@@ -195,10 +196,11 @@ object PokerLogic {
                                     "A value 4-bet aims to maximize the potential of your strong hand by building a larger pot, especially when you expect weaker hands to continue or call."
                         }
                         facingThreeBetRange.fourBetBluffRange.contains(hand) -> {
-                            advice = "4-Bet as a Bluff"
+                            advice = "4-Bet Bluff or Fold"
                             explanation = "This hand ($handKey) can be used as a 4-bet bluff against a 3-bet from $threeBetPosition when you're in $position. " +
                                     "4-bet bluffing adds pressure on your opponent, often forcing folds from marginal hands. Using these bluffs also helps balance your overall range, " +
-                                    "making it harder for opponents to read your hand strength in similar situations."
+                                    "making it harder for opponents to read your hand strength in similar situations." +
+                                    " However, if you feel your opponent is a balanced or strong player, folding is better here."
                         }
                         facingThreeBetRange.callRange.contains(hand) -> {
                             advice = "Call"
@@ -245,9 +247,10 @@ object PokerLogic {
                                     "While not strong enough to move all-in, it has good playability and equity to continue."
                         }
                         facingFourBetRange.bluffRange.contains(hand) -> {
-                            advice = "All-In as a Bluff"
+                            advice = "All-In Bluff or Fold"
                             explanation = "As the 3-bettor, this hand ($handKey) can be used as an all-in bluff against a 4-bet from $fourBetPosition. " +
-                                    "While risky, occasionally moving all-in with these hands helps balance your range and prevents opponents from exploiting you."
+                                    "While risky, occasionally moving all-in with these hands helps balance your range and prevents opponents from exploiting you." +
+                                    " Folding is suggested if you believe your opponent is extremely tight."
                         }
                         else -> {
                             advice = "Fold"

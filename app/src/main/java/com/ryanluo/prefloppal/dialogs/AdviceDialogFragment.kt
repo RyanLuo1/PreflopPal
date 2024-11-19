@@ -12,6 +12,19 @@ import com.ryanluo.prefloppal.R
 
 class AdviceDialogFragment : DialogFragment() {
 
+    private fun setAdviceText(adviceTextView: TextView, advice: String) {
+        adviceTextView.text = advice
+
+        val textSize = when {
+            advice.contains("3-Bet Bluff or Fold", ignoreCase = true) -> 32f
+            advice.contains("4-Bet Bluff or Fold", ignoreCase = true) -> 32f
+            advice.contains("All-in Bluff or Fold", ignoreCase = true) -> 32f
+            else -> 44f
+        }
+
+        adviceTextView.textSize = textSize
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = LayoutInflater.from(context).inflate(R.layout.advice_popup, null)
 
@@ -22,7 +35,7 @@ class AdviceDialogFragment : DialogFragment() {
 
         arguments?.let { args ->
             val advice = args.getString("advice", "")
-            adviceText.text = advice
+            setAdviceText(adviceText, advice)
             explanationText.text = args.getString("explanation", "")
             handStrengthBar.progress = args.getInt("strength", 0)
             handStrengthText.text = args.getString("strengthText", "")
@@ -41,15 +54,15 @@ class AdviceDialogFragment : DialogFragment() {
         val colorRes = when {
             // 4-bet situations
             advice.contains("4-Bet for Value", ignoreCase = true) -> R.color.green
-            advice.contains("4-Bet as a Bluff", ignoreCase = true) -> R.color.orange
+            advice.contains("4-Bet Bluff or Fold", ignoreCase = true) -> R.color.orange
 
             // 3-bet situations
             advice.contains("3-Bet for Value", ignoreCase = true) -> R.color.green
-            advice.contains("3-Bet as a Bluff", ignoreCase = true) -> R.color.orange
+            advice.contains("3-Bet Bluff or Fold", ignoreCase = true) -> R.color.orange
 
             // All-in situations
+            advice.contains("All-In Bluff or Fold", ignoreCase = true) -> R.color.orange
             advice.contains("All-In", ignoreCase = true) -> R.color.green
-            advice.contains("All-In as a Bluff", ignoreCase = true) -> R.color.orange
 
             // Mixed strategies
             advice.contains("Raise or Call", ignoreCase = true) -> R.color.blue_500

@@ -45,9 +45,11 @@ class LearnActivity : AppCompatActivity() {
     private fun setupWelcomeText() {
         val welcomeText = findViewById<TextView>(R.id.welcomeText)
         val text = SpannableStringBuilder(
-            "Welcome to the Preflop Practice Mode—your comprehensive tool for mastering poker strategy from the very first action. This interactive section is designed to help you practice real-world preflop scenarios, sharpen your decision-making skills, and deepen your understanding of preflop ranges and strategies. Whether you're a beginner looking to learn the fundamentals or an experienced player refining your edge, this tool offers a dynamic way to practice and improve.\n\n" +
-                    "In addition to the practice mode, we've included an FAQ page to answer common questions and a Terminology page to familiarize you with essential poker terms. These resources ensure you have the support and knowledge needed to confidently navigate and enhance your preflop game.\n\n" +
-                    "Dive in, explore, and start your journey to becoming a more skilled and strategic poker player!"
+            "Welcome to the Preflop Practice Mode" +
+                    "\n\nThis comprehensive tool will help you master poker strategy from the very first action. This interactive section is designed to help simulate real-world preflop scenarios and sharpen your decision-making skills. Whether you're a beginner looking to learn the fundamentals or an experienced player refining your edge, this tool offers a dynamic way to practice and improve." +
+                    "\n\nIn addition to the practice mode, we've included an FAQ page to answer common questions and Terminology page to familiarize you with essential poker terms. These resources ensure you have the support and knowledge needed to confidently navigate and enhance your poker game." +
+                    "\n\nDive in, explore, and start your journey to becoming a more skilled and strategic poker player!" +
+                    "\n\nNote: Practice Mode is currently under development and will be available soon. Stay tuned!"
         )
 
         // Make "Preflop Practice Mode" bold
@@ -71,6 +73,15 @@ class LearnActivity : AppCompatActivity() {
             StyleSpan(Typeface.BOLD),
             text.indexOf("Terminology page"),
             text.indexOf("Terminology page") + "Terminology page".length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        // Make the note bold and styled
+        val noteStart = text.indexOf("Note:")
+        text.setSpan(
+            StyleSpan(Typeface.BOLD_ITALIC),
+            noteStart,
+            text.length,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
