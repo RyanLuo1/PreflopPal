@@ -67,13 +67,16 @@ class MainActivity : AppCompatActivity() {
 
         setupToolbar()
         setupCardSelection()
+
         setupPositionDropdown()
         setupPositionInfo()
 
         setupActionTable()
-
+        setupResetButton()
         setupPreviousActionInfo()
+
         setupGetAdviceButton()
+
         setupBottomNavigation()
     }
 
@@ -376,6 +379,23 @@ class MainActivity : AppCompatActivity() {
                     addPositionRowWithOptions(position, listOf("fold", "all in"))
                 }
             }
+        }
+    }
+
+    private fun setupResetButton() {
+        findViewById<ImageView>(R.id.resetButton).setOnClickListener {
+            // Clear action states
+            resetBettingStates()
+            positionActions.clear()
+
+            // Get the current position
+            val selectedPosition = positionDropdown.text.toString()
+
+            // Reset the table to show only up to the user's position
+            updateActionTableForPosition(selectedPosition)
+
+            // Reset the action summary
+            updateActionSummary()
         }
     }
 

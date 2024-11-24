@@ -4,10 +4,9 @@ import com.ryanluo.prefloppal.models.Nine_Max_FacingFourBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_FacingThreeBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_RFIThreeBetRanges
 import com.ryanluo.prefloppal.models.Nine_Max_RFI_Ranges
-import com.ryanluo.prefloppal.models.Six_Max_FacingFourBetRanges
 
+import com.ryanluo.prefloppal.models.Six_Max_FacingFourBetRanges
 import com.ryanluo.prefloppal.models.Six_Max_FacingThreeBetRanges
-import com.ryanluo.prefloppal.models.Six_Max_RFICallingRanges
 import com.ryanluo.prefloppal.models.Six_Max_RFIThreeBetRanges
 import com.ryanluo.prefloppal.models.Six_Max_RFI_Ranges
 
@@ -56,9 +55,8 @@ object PokerLogic {
 
     // 6max ranges (your existing ones)
     private val SIX_MAX_RFI_RANGES = Six_Max_RFI_Ranges.RANGES
-    private val SIX_MAX_CALLING_RANGES = Six_Max_RFICallingRanges.RANGES
     private val SIX_MAX_THREE_BET_RANGES = Six_Max_RFIThreeBetRanges.RANGES
-    private val SIX_MAX_FACING_THREE_BET_RANGES = Nine_Max_FacingThreeBetRanges.RANGES
+    private val SIX_MAX_FACING_THREE_BET_RANGES = Six_Max_FacingThreeBetRanges.RANGES
 
     // 9max ranges (placeholders - you'll implement these)
     private val NINE_MAX_RFI_RANGES = Nine_Max_RFI_Ranges.RANGES

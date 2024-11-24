@@ -228,6 +228,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/previousActionTitle"/>
 
+            <ImageView
+                android:id="@+id/resetButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_refresh"
+                android:clickable="true"
+                android:focusable="true"
+                app:tint="@color/dark_purple"
+                app:layout_constraintTop_toTopOf="@id/previousActionTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/previousActionTitle"/>
+
             <TextView
                 android:id="@+id/actionSummaryText"
                 android:layout_width="match_parent"
