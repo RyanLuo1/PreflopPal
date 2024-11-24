@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="How to Input Previous Actions"
+        android:text="How to use Action Table"
         android:textAlignment="center"
         android:textStyle="bold"
         android:textSize="20sp"
@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Describe what happened before your action:\n\nBasic Format:\n[Position] [Action], [Position] [Action], ...\n\nExamples:\n• Everyone folds\n• Under The Gun opens, MP 3!\n• CO raises to 2.5BB, BTN 3-bets\n\nTips:\n• Use Player Positions\n• Use commas, 'then', or 'and' to separate actions \n\nFollowing these tips will allow Preflop Pal to give you the best advice!"
+        android:text="The action table allows you to input what happened before your move.\n\n    • All positions start on fold by default.\n\n    • Your position is always highlighted\n\n    • Made a mistake? Use the reset button located in the top left to start over.\n\nThe table automatically updates based on actions selected, and a summary appears at the top."
         android:textSize="16sp"
         android:lineSpacingExtra="4dp"
         android:layout_marginBottom="16dp"/>
