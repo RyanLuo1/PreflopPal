@@ -36,6 +36,7 @@ import com.ryanluo.prefloppal.dialogs.CardSelectionDialog
 import com.ryanluo.prefloppal.utils.Hand
 import com.ryanluo.prefloppal.utils.PokerLogic
 import com.ryanluo.prefloppal.R
+import com.ryanluo.prefloppal.auth.WelcomeActivity
 import com.ryanluo.prefloppal.data.HandRecord
 import com.ryanluo.prefloppal.utils.FirebaseManager
 import com.ryanluo.prefloppal.utils.TableSize
@@ -89,6 +90,36 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageView>(R.id.menuIcon).setOnClickListener { view ->
             showPopupMenu(view)
         }
+
+        // Setup back button with confirmation dialog
+        findViewById<ImageView>(R.id.backButton).setOnClickListener {
+            showLogoutConfirmationDialog()
+        }
+    }
+
+    private fun showLogoutConfirmationDialog() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this, R.style.CustomAlertDialog)
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.logout_dialog, null)
+
+        builder.setView(dialogView)
+
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // Set up button clicks
+        dialogView.findViewById<MaterialButton>(R.id.yesButton).setOnClickListener {
+            firebaseManager.signOut()
+            WelcomeActivity.startActivity(this)
+            finish()
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<MaterialButton>(R.id.noButton).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showPopupMenu(view: View) {

@@ -17,6 +17,17 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="start"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_back"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/white"/>
+
+        <ImageView
             android:id="@+id/toolbarLogo"
             android:layout_width="250dp"
             android:layout_height="72dp"
