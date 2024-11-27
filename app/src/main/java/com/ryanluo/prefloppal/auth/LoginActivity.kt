@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ryanluo.prefloppal.main.MainActivity
@@ -19,6 +20,19 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var emailInputLayout: TextInputLayout
     private lateinit var passwordInputLayout: TextInputLayout
     private lateinit var firebaseManager: FirebaseManager
+    private lateinit var rememberMeCheckbox: MaterialCheckBox
+
+    companion object {
+        private const val PREFS_NAME = "LoginPrefs"
+        private const val KEY_REMEMBER_ME = "remember_me"
+        private const val KEY_EMAIL = "email"
+        private const val KEY_PASSWORD = "password"
+
+        fun startActivity(context: Context) {
+            val intent = Intent(context, LoginActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,17 +41,31 @@ class LoginActivity : AppCompatActivity() {
         // Initialize FirebaseManager
         firebaseManager = FirebaseManager.getInstance()
 
-        // Back button logic
-        findViewById<ImageView>(R.id.backButton).setOnClickListener {
-            finish()
-        }
-
-        // Initialize input layouts and fields
+        // Initialize views
         emailInputLayout = findViewById(R.id.emailInputLayout)
         passwordInputLayout = findViewById(R.id.passwordInputLayout)
         val emailInput = findViewById<TextInputEditText>(R.id.emailInput)
         val passwordInput = findViewById<TextInputEditText>(R.id.passwordInput)
         val loginButton = findViewById<MaterialButton>(R.id.loginSubmitButton)
+        rememberMeCheckbox = findViewById(R.id.rememberMeCheckbox)
+
+        // Load saved preferences
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val rememberedEmail = prefs.getString(KEY_EMAIL, "")
+        val rememberedPassword = prefs.getString(KEY_PASSWORD, "")
+        val rememberMe = prefs.getBoolean(KEY_REMEMBER_ME, false)
+
+        // Set remembered values if they exist
+        if (rememberMe) {
+            rememberMeCheckbox.isChecked = true
+            emailInput.setText(rememberedEmail)
+            passwordInput.setText(rememberedPassword)
+        }
+
+        // Back button logic
+        findViewById<ImageView>(R.id.backButton).setOnClickListener {
+            finish()
+        }
 
         // Clear errors when user starts typing
         emailInput.addTextChangedListener(object : TextWatcher {
@@ -61,25 +89,48 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordInput.text.toString()
 
             if (validateInput(email, password)) {
-                // Disable the login button to prevent multiple clicks during the login process
                 loginButton.isEnabled = false
 
-                // Call FirebaseManager to sign in the user
                 firebaseManager.signIn(email, password) { success, error ->
                     runOnUiThread {
-                        // Re-enable the login button after the sign-in process is complete
                         loginButton.isEnabled = true
                         if (success) {
-                            // Navigate to MainActivity on successful login
-                            MainActivity.startActivity(this)
-                            finish()
+                            if (firebaseManager.isEmailVerified()) {
+                                // Save credentials if remember me is checked
+                                saveLoginPreferences(email, password)
+
+                                // Navigate to MainActivity
+                                MainActivity.startActivity(this)
+                                finish()
+                            } else {
+                                Toast.makeText(
+                                    this,
+                                    "Please verify your email before logging in",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                firebaseManager.signOut()
+                            }
                         } else {
-                            // Show error message if login fails
                             Toast.makeText(this, error ?: "Login failed", Toast.LENGTH_LONG).show()
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun saveLoginPreferences(email: String, password: String) {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putBoolean(KEY_REMEMBER_ME, rememberMeCheckbox.isChecked)
+            if (rememberMeCheckbox.isChecked) {
+                putString(KEY_EMAIL, email)
+                putString(KEY_PASSWORD, password)
+            } else {
+                remove(KEY_EMAIL)
+                remove(KEY_PASSWORD)
+            }
+            apply()
         }
     }
 
@@ -103,12 +154,5 @@ class LoginActivity : AppCompatActivity() {
         }
 
         return isValid
-    }
-
-    companion object {
-        fun startActivity(context: Context) {
-            val intent = Intent(context, LoginActivity::class.java)
-            context.startActivity(intent)
-        }
     }
 }

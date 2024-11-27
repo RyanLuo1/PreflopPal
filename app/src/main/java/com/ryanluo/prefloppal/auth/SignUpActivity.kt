@@ -82,14 +82,34 @@ class SignUpActivity : AppCompatActivity() {
 
                 // Call FirebaseManager to create a new user
                 firebaseManager.createUser(email, password) { success, error ->
-                    runOnUiThread {
-                        signUpButton.isEnabled = true
-                        if (success) {
-                            // Navigate to main activity on successful sign-up
-                            MainActivity.startActivity(this)
-                            finish()
-                        } else {
-                            // Show error message if sign-up fails
+                    if (success) {
+                        // Send verification email
+                        firebaseManager.sendEmailVerification { emailSent, emailError ->
+                            runOnUiThread {
+                                signUpButton.isEnabled = true
+                                if (emailSent) {
+                                    // Show success message and navigate to login
+                                    Toast.makeText(
+                                        this,
+                                        "Account created! Please check your email to verify your account.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    // Sign out the user so they have to log in after verification
+                                    firebaseManager.signOut()
+                                    LoginActivity.startActivity(this)
+                                    finish()
+                                } else {
+                                    Toast.makeText(
+                                        this,
+                                        emailError ?: "Failed to send verification email",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    } else {
+                        runOnUiThread {
+                            signUpButton.isEnabled = true
                             Toast.makeText(this, error ?: "Sign up failed", Toast.LENGTH_LONG).show()
                         }
                     }

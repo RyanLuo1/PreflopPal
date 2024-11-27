@@ -112,4 +112,20 @@ class FirebaseManager private constructor() {
                 callback(task.isSuccessful)
             }
     }
+
+    fun sendEmailVerification(callback: (Boolean, String?) -> Unit) {
+        auth.currentUser?.sendEmailVerification()
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    callback(true, null)
+                } else {
+                    callback(false, task.exception?.message)
+                }
+            }
+    }
+
+    fun isEmailVerified(): Boolean {
+        return auth.currentUser?.isEmailVerified ?: false
+    }
+
 }
