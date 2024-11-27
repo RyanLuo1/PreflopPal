@@ -99,9 +99,16 @@ object PokerLogic {
 
     fun getAdvice(hand: Hand, position: String, actionSummary: String?, tableSize: TableSize): Triple<String, String, Double> {
         val handKey = hand.toKey()
-        val handStrength = calculateHandStrength(hand, position)
         val actions = parseActionSummary(actionSummary ?: "", tableSize)
         val lastRaise = actions.lastOrNull { it.second in listOf("raises", "3-bets", "4-bets", "All-in") }
+
+        // Set the action type for hand strength calculation
+        val strengthAction = when (lastRaise?.second) {
+            "3-bets" -> "3bet"
+            "4-bets" -> "4bet"
+            else -> "Open"
+        }
+        val handStrength = calculateHandStrength(hand, position, strengthAction)
 
         val advice: String
         val explanation: String
@@ -282,7 +289,7 @@ object PokerLogic {
             lastRaise?.second == "All-in" -> {
                 val allInPosition = lastRaise.first
                 when {
-                    setOf("AA", "KK", "AKs").contains(handKey) -> {
+                    setOf("AA", "KK", "AKs", "QQ").contains(handKey) -> {
                         advice = "Call"
                         explanation = "With ${handKey}, you can call the all-in from $allInPosition. " +
                                 "These premium hands have enough equity to profitably call an all-in."
@@ -305,24 +312,24 @@ object PokerLogic {
         return Triple(advice, explanation, handStrength)
     }
 
-    private fun calculateHandStrength(hand: Hand, position: String): Double {
+    private fun calculateHandStrength(hand: Hand, position: String, action: String = "Open"): Double {
         val rankOrder = listOf('A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2')
 
         fun calculateBaseStrength(hand: Hand): Double {
             return when {
-                // High pairs get high base scores
+                // Pairs get higher base scores
                 hand.isPair -> 6.0 + (14 - rankOrder.indexOf(hand.card1.rank)) * 0.3
-                // Non-pairs are rated by their card ranks
+                // Non-pairs rated by their ranks
                 else -> {
                     val highCardRank = minOf(rankOrder.indexOf(hand.card1.rank), rankOrder.indexOf(hand.card2.rank))
                     val lowCardRank = maxOf(rankOrder.indexOf(hand.card1.rank), rankOrder.indexOf(hand.card2.rank))
-                    4.5 + (14 - highCardRank) * 0.2 + (14 - lowCardRank) * 0.1
+                    3.5 + (14 - highCardRank) * 0.2 + (14 - lowCardRank) * 0.1
                 }
             }
         }
 
-        fun getPositionMultiplier(position: String): Double {
-            return when (position) {
+        fun getPositionMultiplier(position: String, action: String): Double {
+            val baseMultiplier = when (position) {
                 "BTN" -> 1.1
                 "CO" -> 1.05
                 "MP" -> 1.0
@@ -330,6 +337,29 @@ object PokerLogic {
                 "SB" -> 0.85
                 "BB" -> 0.9
                 else -> 1.0
+            }
+
+            // Adjust for 3bet/4bet scenarios
+            return when (action) {
+                "3bet" -> baseMultiplier * 0.9
+                "4bet" -> baseMultiplier * 0.7
+                "All-in" -> baseMultiplier * 0.6
+                else -> baseMultiplier
+            }
+        }
+
+        fun getPremiumHandBonus(hand: Hand, action: String): Double {
+            val isAA = hand.isPair && hand.card1.rank == 'A'
+            val isKK = hand.isPair && hand.card1.rank == 'K'
+            val isQQ = hand.isPair && hand.card1.rank == 'Q'
+            val isAK = !hand.isPair && ((hand.card1.rank == 'A' && hand.card2.rank == 'K') ||
+                    (hand.card1.rank == 'K' && hand.card2.rank == 'A'))
+            return when {
+                action == "4bet" && (isAA || isKK) -> 2.0
+                action == "4bet" && (isQQ || isAK) -> 1.5
+                action == "3bet" && (isAA || isKK || isQQ) -> 1.5
+                action == "3bet" && isAK -> 1.0
+                else -> 0.0
             }
         }
 
@@ -357,7 +387,6 @@ object PokerLogic {
         }
 
         fun getSuitednessBonus(hand: Hand): Double {
-            // If the hand is suited and one of the cards is an Ace, apply a bonus of 1.0
             return when {
                 hand.isSuited && (hand.card1.rank == 'A' || hand.card2.rank == 'A') -> 1.4
                 hand.isSuited -> 0.5
@@ -368,19 +397,15 @@ object PokerLogic {
         fun getLowCardPenalty(hand: Hand): Double {
             val rank1 = rankOrder.indexOf(hand.card1.rank)
             val rank2 = rankOrder.indexOf(hand.card2.rank)
-
-            // Check if one of the cards is an Ace
             val hasAce = hand.card1.rank == 'A' || hand.card2.rank == 'A'
 
-            // Calculate the base penalty for low cards
             val basePenalty = when {
-                rank1 >= 8 && rank2 >= 8 -> 2.0  // Heavy penalty for very low cards like 7-2
-                rank1 >= 6 && rank2 >= 6 -> 1.5  // Moderate penalty for hands like 8-5
-                rank1 >= 4 && rank2 >= 4 -> 1.0  // Smaller penalty for hands like 6-4
+                rank1 >= 8 && rank2 >= 8 -> 2.0  // Heavy penalty for very low cards
+                rank1 >= 6 && rank2 >= 6 -> 1.5  // Moderate penalty
+                rank1 >= 4 && rank2 >= 4 -> 1.0  // Small penalty
                 else -> 0.0
             }
 
-            // If there's an Ace, halve the penalty
             return if (hasAce) basePenalty / 2 else basePenalty
         }
 
@@ -390,20 +415,39 @@ object PokerLogic {
             val rank2 = rankOrder.indexOf(hand.card2.rank)
             val gap = abs(rank1 - rank2)
 
-            // Apply a penalty starting at 1.5 for a gap of 4, with an additional 0.3 per rank beyond that.
             return if (gap >= 4) 1.5 + (gap - 4) * 0.3 else 0.0
         }
 
+        // Calculate all components
         val baseStrength = calculateBaseStrength(hand)
-        val positionMultiplier = getPositionMultiplier(position)
+        val positionMultiplier = getPositionMultiplier(position, action)
         val suitednessBonus = getSuitednessBonus(hand)
         val connectorBonus = getConnectorBonus(hand)
         val broadwayBonus = getBroadwayBonus(hand)
-        val lowCardPenalty = getLowCardPenalty(hand)
-        val disconnectedPenalty = getDisconnectedPenalty(hand)
+        val premiumHandBonus = getPremiumHandBonus(hand, action)
 
-        // Adjust the raw strength based on bonuses and penalties
-        val rawStrength = (baseStrength * positionMultiplier + suitednessBonus + connectorBonus + broadwayBonus - lowCardPenalty - disconnectedPenalty).coerceIn(0.0, 10.0)
+        // Adjust penalties based on action
+        val finalLowCardPenalty = when (action) {
+            "3bet" -> getLowCardPenalty(hand) * 1.5
+            "4bet" -> getLowCardPenalty(hand) * 2.0
+            else -> getLowCardPenalty(hand)
+        }
+
+        val finalDisconnectedPenalty = when (action) {
+            "3bet" -> getDisconnectedPenalty(hand) * 1.3
+            "4bet" -> getDisconnectedPenalty(hand) * 1.6
+            else -> getDisconnectedPenalty(hand)
+        }
+
+        // Calculate final strength
+        val rawStrength = (baseStrength * positionMultiplier +
+                suitednessBonus +
+                connectorBonus +
+                broadwayBonus +
+                premiumHandBonus -
+                finalLowCardPenalty -
+                finalDisconnectedPenalty).coerceIn(0.0, 10.0)
+
         return (rawStrength * 10).roundToInt() / 10.0
     }
 

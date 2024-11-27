@@ -169,6 +169,7 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = ArrayAdapter(this, R.layout.position_dropdown, positions)
         positionDropdown.setAdapter(adapter)
+        positionDropdown.dropDownHeight = 850
 
         positionDropdown.setOnItemClickListener { _, _, _, _ ->
             val selectedPosition = positionDropdown.text.toString()
