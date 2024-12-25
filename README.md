@@ -38,7 +38,7 @@ Enter your hole cards using the simple input feature.
 Select your position at the table (e.g., small blind, big blind, early position, etc.)
 
 ### Input Previous Action
-Preflop Pal’s natural language input lets you easily describe actions like "UTG raises, CO calls" or "everyone folds." Simply describe the action as you would to a friend.
+The action table allows you to input what happened before your move. All positions start on fold by default, and your position is always highlighted. The table automatically updates based on actions selected, and a summary appears at the top.
 
 ### Learn and Practice: 
 The system will guide you through what action to take (raise, fold, call) based on optimal preflop strategy from GTO theory for your position and hand.
