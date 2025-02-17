@@ -6,7 +6,7 @@
 Thank you for using Preflop Pal. This privacy policy explains how we handle your data.
 
 ## Data Collection
-Preflop Pal does not collect, store, or transmit any personal information from its users. The app functions entirely offline and does not require any personal data to operate.
+Preflop Pal does not transmit any personal information from its users. The app functions entirely offline and does not require any personal data to operate.
 
 ## App Permissions
 Our app does not require any special permissions to function. It operates as a standalone poker strategy application without accessing any device features or personal information.
